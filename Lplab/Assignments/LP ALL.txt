@@ -1,0 +1,8643 @@
+
+ASS1
+1. %{
+
+#include<stdio.h>
+
+int con=0;
+
+int vow=0;
+
+%}
+
+
+
+%%
+
+[aeiouAEIOU] {vow++;}
+
+[a-zA-Z] {con++;}
+
+[' '\t\n] {;}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter the input: ");
+
+	yylex();
+
+	printf("No. of vowels: %d\n",vow);
+
+	printf("No. of consonants: %d\n",con);
+
+	return 0;
+
+}
+
+2.%{
+
+#include<stdio.h>
+
+int len=0;
+
+%}
+
+
+
+%%
+
+. {len++;}
+
+[\n] {;}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter the string: ");
+
+	yylex();
+
+	printf("Length of string: %d\n",len);
+
+	return 0;
+
+}
+
+3.%{
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+int pi=0,ni=0,pf=0,nf=0;
+
+%}
+
+
+
+%%
+
+[0] {printf("%s is not positive nor negative\n",yytext);}
+
+[+]?[0-9]* {printf("%s is positive integer\n",yytext);pi++;}  //[+]? means + is optional
+
+[-][0-9]* {printf("%s is negative integer\n",yytext);ni++;}
+
+[+]?[0-9]*\.[0-9]* {printf("%s is positive fraction\n",yytext);pf++;} // \. means division
+
+[-][0-9]*\.[0-9]* {printf("%s is negative fraction\n",yytext);nf++;}
+
+[' '\t\n] {;}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter input: ");
+
+	yylex();
+
+	printf("No. of positive integers: %d\n",pi);
+
+	printf("No. of negative integers: %d\n",ni);
+
+	printf("No. of positive fractions: %d\n",pf);
+
+	printf("No. of positive fractions: %d\n",nf);
+
+	return 0;
+
+}
+
+4.%{
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+int chars=0,word=0,line=0;
+
+%}
+
+
+
+space [\t' ']
+
+%%
+
+\n {line++;word++;chars++;}
+
+^{space}* {chars += yyleng;}
+
+{space}* {word++; chars += yyleng;}
+
+. {chars++;}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter the input: ");
+
+	yylex();
+
+	printf("No. of characters: %d\n",chars);
+
+	printf("No. of words: %d\n",word);
+
+	printf("No. of lines: %d\n",line);
+
+	return 0;
+
+}
+
+5.%{
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+int alp=0,nalp=0;
+
+%}
+
+
+
+%%
+
+[a-zA-Z' '\t] {alp++;} //spcaes are not special characters
+
+. {nalp++;printf("%s",yytext);}
+
+[\n] {;}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter the input: ");
+
+	yylex();
+
+	if(nalp != 0) printf(" are characters other than alphabets\n");
+
+	printf("No. of alphabets: %d\n",alp);
+
+	printf("No. of special characters: %d\n",nalp);
+
+	return 0;
+
+}
+
+6.%{
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+int cnt=0;
+
+%}
+
+
+
+%%
+
+[a-zA-Z]+ {if(strlen(yytext)>=3 && strlen(yytext)<=5) printf("%s",yytext),cnt++;}
+
+[' '\t\n] {;}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter the input: ");
+
+	yylex();
+
+	if(cnt != 0) printf(" are the strings with 3 to 5 alphabets\n");
+
+	printf("No. of such strings: %d\n",cnt);
+
+	return 0;
+
+}
+
+7.%{
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+int sl=0,cl=0,ss=0,nm=0;
+
+%}
+
+
+
+%%
+
+[' '\t\n] {;}
+
+[a-z] {sl++;}
+
+[A-Z] {cl++;}
+
+[0-9] {nm++;}
+
+. {ss++;}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter the input: ");
+
+	yylex();
+
+	printf("No. of small letter: %d\n",sl);
+
+	printf("No. of capital letter: %d\n",cl);
+
+	printf("No. of special symbols: %d\n",ss);
+
+	printf("No. of numeric: %d\n",nm);
+
+	return 0;
+
+}
+
+ASS2
+
+1.CYK ALGO
+#include<bits/stdc++.h>
+using namespace std;
+int main() {
+    int n;
+    cout << "number of production rules : ";
+    cin >> n;
+    string prod;
+    map<char, set<char>> mp1;
+    map<string, set<char>> mp2;
+    for(int i = 0; i < n; i++) {
+        cout << "enter production number " << i + 1 << " : ";
+        cin >> prod;
+        if(prod.size() == 2) mp1[prod[1]].insert(prod[0]);
+        else mp2[prod.substr(1)].insert(prod[0]);
+    }
+    string str;
+    cout << "enter string : ";
+    cin >> str;
+    int w = str.size();
+    vector<vector<set<char>>> arr(w, vector<set<char>>(w, set<char>()));
+    map<string, pair<int, int>> mp;
+    for(int i = 0; i < w; i++) {
+        for(int j = i; j < w; j++) {
+            string s = str.substr(j - i, i + 1);
+            mp[s] = make_pair(i, j);
+        }
+    }
+    for(int j = 0; j < w; j++) arr[0][j] = mp1[str[j]];
+    for(int i = 1; i < w; i++) {
+        for(int j = i; j < w; j++) {
+            set<char> se;
+            string s = str.substr(j - i, i + 1);
+            for(int k = 1; k < s.size(); k++) {
+                string s1 = s.substr(0, k);
+                string s2 = s.substr(k);
+                pair<int, int> p1 = mp[s1];
+                pair<int, int> p2 = mp[s2];
+                if(arr[p1.first][p1.second].empty() || arr[p2.first][p2.second].empty()) continue;
+                for(auto it : arr[p1.first][p1.second]) {
+                    for(auto it1 : arr[p2.first][p2.second]) {
+                        string st = "";
+                        st.push_back(it);
+                        st.push_back(it1);
+                        for(auto i : mp2[st]) se.insert(i);
+                    }
+                }
+            }
+            arr[i][j] = se;
+        }
+    }
+    if(arr[w - 1][w - 1].find('S') != arr[w - 1][w - 1].end()) cout << "true";
+    else cout << "false";
+}
+
+2.INFIX TO POSTFIX
+%{
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+typedef struct node {
+
+	char *data;
+
+	struct node *left;
+
+	struct node *right;
+
+}*tptr;
+
+char *charstack[100];
+
+tptr nodestack[100];
+
+int topnode=-1,topchar=-1;
+
+int precedence(char);
+
+%}
+
+
+
+%%
+
+"um"|\@|[\+\-\*\/\(\)\%] {
+
+	if(topchar == -1) {
+
+		charstack[++topchar] = (char*)malloc(strlen(yytext)+1);
+
+		strcat(charstack[topchar],yytext);
+
+	}
+
+	else {
+
+		if(yytext[0]=='(') {
+
+			charstack[++topchar] = (char*)malloc(strlen(yytext)+1);
+
+			strcat(charstack[topchar],yytext);
+
+		}
+
+		else if(yytext[0]==')') {
+
+			while(charstack[topchar][0] != '(') {
+
+				tptr temp=(tptr)malloc(sizeof(tptr));
+
+				temp->data=(char*)malloc(strlen(charstack[topchar]+1));
+
+				strcat(temp->data,charstack[topchar]);
+
+				if(topnode<1) {
+
+					printf("Wrong Input\n");
+
+					return -1;
+
+				}
+
+				temp->right=nodestack[topnode];
+
+				topnode--;
+
+				if(yytext[0]=='u') temp->left=NULL;
+
+				else {
+
+					temp->left=nodestack[topnode];
+
+					topnode--;
+
+				}
+
+				nodestack[++topnode]=temp;
+
+				topchar--;
+
+				if(topchar==-1) {
+
+					printf("Wrong Input\n");
+
+					return -1;
+
+				}
+
+			}
+
+			topchar--;
+
+		}
+
+		else {
+
+			if(yytext[0]=='@' || yytext[0]=='u') {
+
+				while(topchar>=0 && precedence(yytext[0]) < precedence(charstack[topchar][0])) {
+
+					tptr temp=(tptr)malloc(sizeof(tptr));
+
+					temp->data=(char*)malloc(strlen(charstack[topchar]+1));
+
+					if(topnode<1) {
+
+						printf("Wrong Input\n");
+
+						return -1;
+
+					}
+
+					strcat(temp->data,charstack[topchar]);
+
+					temp->right=nodestack[topnode];
+
+					topnode--;
+
+					if(yytext[0]=='u') temp->left=NULL;
+
+					else {
+
+						temp->left=nodestack[topnode];
+
+						topnode--;
+
+					}
+
+					nodestack[++topnode]=temp;
+
+					topchar--;
+
+				}
+
+			}
+
+			else {
+
+				while(topchar>=0 && precedence(yytext[0]) <= precedence(charstack[topchar][0])) {
+
+					tptr temp=(tptr)malloc(sizeof(tptr));
+
+					temp->data=(char*)malloc(strlen(charstack[topchar]+1));
+
+					if(topnode<1) {
+
+						printf("Wrong Input\n");
+
+						return -1;
+
+					}
+
+					strcat(temp->data,charstack[topchar]);
+
+					temp->right=nodestack[topnode];
+
+					topnode--;
+
+					if(yytext[0]=='u') temp->left=NULL;
+
+					else {
+
+						temp->left=nodestack[topnode];
+
+						topnode--;
+
+					}
+
+					nodestack[++topnode]=temp;
+
+					topchar--;
+
+				}
+
+			}
+
+			charstack[++topchar]=(char*)malloc(strlen(yytext)+1);
+
+			strcat(charstack[topchar],yytext);
+
+		}
+
+	}
+
+}
+
+[a-z]+|[a-z]*[0-9]+ {
+
+	tptr temp=(tptr)malloc(sizeof(tptr));
+
+	temp->data=(char*)malloc(strlen(yytext)+1);
+
+	strcat(temp->data,yytext);
+
+	temp->left=NULL;
+
+	temp->right=NULL;
+
+	nodestack[++topnode]=temp;
+
+}
+
+[' '\t\n] {;}
+
+%%
+
+
+
+int precedence(char c) {
+
+	if(c=='+' || c=='-') return 1;
+
+	else if(c=='*' || c=='/') return 2;
+
+	else if(c=='u') return 3;
+
+	else if(c=='@') return 4;
+
+	else if(c=='(') return 0;
+
+}
+
+
+
+void prefix(tptr T) {
+
+	if(T==NULL) return;
+
+	printf("%s",T->data);
+
+	prefix(T->left);
+
+	prefix(T->right);
+
+}
+
+void infix(tptr T) {
+
+	if(T==NULL) return;
+
+	infix(T->left);
+
+	printf("%s",T->data);
+
+	infix(T->right);
+
+}
+
+void postfix(tptr T) {
+
+	if(T==NULL) return;
+
+	postfix(T->left);
+
+	postfix(T->right);
+
+	printf("%s",T->data);
+
+}
+
+
+
+int main() {
+
+	printf("Enter the input expression: ");
+
+	yylex();
+
+	while(topchar >= 0) {
+
+		tptr temp=(tptr)malloc(sizeof(tptr));
+
+		temp->data=(char*)malloc(strlen(charstack[topchar]+1));
+
+		if(topnode<1) {
+
+			printf("Wrong Input\n");
+
+			return -1;
+
+		}
+
+		strcat(temp->data,charstack[topchar]);
+
+		temp->right=nodestack[topnode];
+
+		topnode--;
+
+		if(yytext[0]=='u') temp->left=NULL;
+
+		else {
+
+			temp->left=nodestack[topnode];
+
+			topnode--;
+
+		}
+
+		nodestack[++topnode]=temp;
+
+		topchar--;
+
+	}
+
+	tptr expressiontree=nodestack[topnode];
+
+	printf("The Infix of the Expression: ");
+
+	infix(expressiontree);
+
+	printf("\n");
+
+	printf("The Prefix of the Expression: ");
+
+	prefix(expressiontree);
+
+	printf("\n");
+
+	printf("The Postfix of the Expression: ");
+
+	postfix(expressiontree);
+
+	printf("\n");
+
+	return 0;
+
+}
+
+3.CFG
+#include<bits/stdc++.h>
+
+using namespace std;
+
+
+
+set<string> epsilonproductions(map<string,vector<string>> G) {
+
+    set<string> oldvariables,newvariables;
+
+    do {
+
+        oldvariables=newvariables;
+
+        for(auto i:G) {
+
+            for(auto j:i.second) {
+
+                if(j=="@") {
+
+                    newvariables.insert(i.first);
+
+                    break;
+
+                }
+
+                else {
+
+                    for(int k=0;k<j.length();k++) {
+
+                        string temp;
+
+                        temp.push_back(j[k]);
+
+                        if(oldvariables.find(temp)==oldvariables.end()) break;
+
+                        if(k==j.length()-1) newvariables.insert(i.first);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }while(oldvariables != newvariables);
+
+    return newvariables;
+
+}
+
+
+
+map<string,vector<string>> removeepsilonproductions(map<string,vector<string>>&G,set<string> epsilonvariables) {
+
+    map<string,vector<string>> G1;
+
+    do {
+
+        G1=G;
+
+        for(auto i:G) {
+
+            for(auto j:i.second) {
+
+                for(int k=0;k<j.length();k++) {
+
+                    string temp;
+
+                    temp.push_back(j[k]);
+
+                    if(epsilonvariables.find(temp) != epsilonvariables.end()) {
+
+                        string s1=j.substr(0,k)+j.substr(k+1,j.length()-k-1);
+
+                        for(int p=0;p<G[i.first].size();p++) {
+
+                            if(G[i.first][p]==s1) break;
+
+                            if(p==G[i.first].size()-1 && s1.size()>0) G[i.first].push_back(s1);
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }while(G1 != G);
+
+    G1.clear();
+
+    for(auto i:G) {
+
+        for(auto j:i.second) {
+
+            if(j != "@") G1[i.first].push_back(j);
+
+        }
+
+    }
+
+    return G1;
+
+}
+
+
+
+void removingunitproductions(map<string,vector<string>> &G) {
+
+    set<string> S;
+
+    for(auto i:G) {
+
+        for(auto j:i.second) {
+
+            if(j.length()==1 && j[0]>='A' && j[0]<='Z') S.insert(i.first);
+
+        }
+
+    }
+
+    map<string,vector<string>> G1;
+
+    do {
+
+        G1=G;
+
+        for(auto i:S) {
+
+            for(int j=0;j<G[i].size();j++) {
+
+                if(G[i][j].length()==1 && G[i][j][0]>='A' && G[i][j][0]<='Z') {
+
+                    string c=G[i][j];
+
+                    G[i].erase(G[i].begin()+j);
+
+                    for(auto p:G[c]) {
+
+                        bool present=true;
+
+                        for(auto q:G[i]) {
+
+                            if(p==q || (p.length()==1 && p==i)) {
+
+                                present=false;
+
+                                break;
+
+                            }
+
+                        }
+
+                        if(present) G[i].push_back(p);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }while(G != G1);
+
+}
+
+
+
+map<string,vector<string>> removalofuselessproductions(map<string,vector<string>> &G,string start) {
+
+    set<string> OV,NV;
+
+    do {
+
+        OV=NV;
+
+        for(auto i:G) {
+
+            for(auto j:i.second) {
+
+                bool inserted=false;
+
+                for(int p=0;p<j.length();p++) {
+
+                    string temp;
+
+                    temp.push_back(j[p]);
+
+                    if(j[p]>='A' && j[p]<='Z' && NV.find(temp)==NV.end()) break;
+
+                    if(p==j.length()-1) {
+
+                        NV.insert(i.first);
+
+                        inserted=true;
+
+                    }
+
+                }
+
+                if(inserted) break;
+
+            }
+
+        }
+
+    }while(OV != NV);
+
+    map<string,vector<string>> G1;
+
+    vector<string> traverse;
+
+    traverse.push_back(start);
+
+    set<string> pushed;
+
+    pushed.insert(start);
+
+    for(int i=0;i<traverse.size();i++) {
+
+        for(auto j:G[traverse[i]]) {
+
+            for(int p=0;p<j.length();p++) {
+
+                string temp;
+
+                temp.push_back(j[p]);
+
+                if(j[p]>='A' && j[p]<='Z' && NV.find(temp)==NV.end()) break;
+
+                if(j[p]>='A' && j[p]<='Z' && pushed.find(temp)==pushed.end()) {
+
+                    pushed.insert(temp);
+
+                    traverse.push_back(temp);
+
+                }
+
+                if(p==j.length()-1) G1[traverse[i]].push_back(j);
+
+
+
+            }
+
+        }
+
+    }
+
+    return G1;
+
+}
+
+
+
+map<string,vector<string>> removingimmediateleftrecursion(map<string,vector<string>> G) {
+
+    map<string,vector<string>> G1;
+
+    set<string> S;
+
+    for(auto i:G) {
+
+        for(auto j:i.second) {
+
+            if(j[0]==i.first[0]) {
+
+                string temp;
+
+                temp.push_back(i.first[0]);
+
+                S.insert(temp);
+
+            }
+
+        }
+
+    }
+
+    for(auto i:G) {
+
+        if(S.find(i.first)==S.end()) {
+
+            for(auto j:i.second) G1[i.first].push_back(j);
+
+        }
+
+        else {
+
+            vector<string> alpha,beta;
+
+            for(auto j:i.second) {
+
+                if(i.first[0]==j[0]) alpha.push_back(j.substr(1,j.length()-1));
+
+                else beta.push_back(j);
+
+            }
+
+            for(auto j:beta) G1[i.first].push_back(j);
+
+            for(auto j:beta) G1[i.first].push_back(j+i.first[0]+'\'');
+
+            for(auto j:alpha) G1[i.first+'\''].push_back(j);
+
+            for(auto j:beta) G1[i.first+'\''].push_back(j+i.first+'\'');
+
+        }
+
+    }
+
+    return G1;
+
+}
+
+
+
+int main() {
+
+    map<string,vector<string>> G;
+
+    cout<<"Enter the CFG (use @ for epsilon and # to terminate)\n";
+
+    string s;
+
+    getline(cin,s);
+
+    string start;
+
+    while(s != "#") {
+
+        string left;
+
+        string right;
+
+        bool first=false;
+
+        for(int i=0;i<s.length();i++) {
+
+            if(s[i] != ' ' && !first && start.length()==0) start.push_back(s[i]);
+
+            if(s[i] != ' ' && !first) left.push_back(s[i]),first=true;
+
+            else if(s[i] != ' ') right.push_back(s[i]);
+
+        }
+
+        right=right.substr(2,right.length()-2);
+
+        G[left].push_back(right);
+
+        getline(cin,s);
+
+    }
+
+    set<string> epsilonvariables=epsilonproductions(G);
+
+    if(epsilonvariables.size() >= 1) cout<<"Epsilon Productions: ";
+
+    for(auto i:epsilonvariables) cout<<i<<" ";
+
+    cout<<endl;
+
+    G=removeepsilonproductions(G,epsilonvariables);
+
+    cout<<"Grammer after removing epsilon productions\n";
+
+    for(auto i:G) {
+
+        for(auto j:i.second) cout<<i.first<<" -> "<<j<<endl;
+
+    }
+
+    cout<<"Grammer after removing unit productions\n";
+
+    removingunitproductions(G);
+
+    for(auto i:G) {
+
+        for(auto j:i.second) cout<<i.first<<" -> "<<j<<endl;
+
+    }
+
+    cout<<"Grammer after removing useless productions\n";
+
+    G=removalofuselessproductions(G,start);
+
+    for(auto i:G) {
+
+        for(auto j:i.second) cout<<i.first<<" -> "<<j<<endl;
+
+    }
+
+    cout<<"Grammer after removing immediate left recurssions\n";
+
+    G=removingimmediateleftrecursion(G);
+
+    for(auto i:G) {
+
+        for(auto j:i.second) cout<<i.first<<" -> "<<j<<endl;
+
+    }
+
+    return 0;
+
+}
+
+
+ASS3
+
+1.Write a LEX program to recognize the keyword if, begin and identifier which 
+is defined as any string starts with letter and followed by letter or digit.
+%{
+
+#include<stdio.h>
+
+%}
+
+
+
+DIGIT [0-9]
+
+LETTER [a-zA-Z]
+
+ID {LETTER}({LETTER}|{DIGIT})*
+
+DELIM [ \t\r\n]
+
+KEY if|begin
+
+
+
+%%
+
+{KEY} {printf("Keyword: %s\n",yytext);}
+
+{ID} {printf("Identifier: %s\n",yytext);}
+
+{DELIM} {;}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter a sentence: ");
+
+	yylex();
+
+	return 0;
+
+}
+
+2.Write a LEX program to recognize the keyword if, begin and identifier which is defined 
+as any string starts with letter and followed by letter or digit and count
+%{
+
+#include<stdio.h>
+
+int key=0,op=0,id=0;
+
+void print() {
+
+	printf("Count: \nKeywords: %d\nIdentifiers: %d\nOperators: %d\n",key,id,op);
+
+	key=op=id=0;
+
+}
+
+%}
+
+
+
+DIGIT [0-9]
+
+LETTER [a-zA-Z]
+
+ID {LETTER}({LETTER}|{DIGIT})*
+
+DELIM [ \t\r]
+
+KEY if|begin
+
+OP [\+\-\*\/\%\=]
+
+
+
+%%
+
+{KEY} {printf("Keyword: %s\n",yytext);key++;}
+
+{ID} {printf("Identifier: %s\n",yytext);id++;}
+
+{OP} {printf("Operators: %s\n",yytext);op++;}
+
+{DELIM} {;}
+
+[\n] {print();}
+
+%% 
+
+
+
+int main() {
+
+	printf("Enter a sentence: ");
+
+	yylex();
+
+}
+
+3.Write a Lex program to recognize whether a given sentence is simple or compound.
+%{
+
+#include<stdio.h>
+
+int comp=0;
+
+void print() {
+
+	if(comp) printf("The sentence is compound\n");
+
+	else printf("The sentence is simple\n");
+
+	comp=0;
+
+}
+
+%}
+
+
+
+DELIM [ \t\r]
+
+%%
+
+{DELIM}for{DELIM} comp=1;
+
+{DELIM}ans{DELIM} comp=1;
+
+{DELIM}not{DELIM} comp=1;
+
+{DELIM}but{DELIM} comp=1;
+
+{DELIM}or{DELIM} comp=1;
+
+{DELIM}yet{DELIM} comp=1;
+
+{DELIM}so{DELIM} comp=1;
+
+{DELIM} {;}
+
+. {;}
+
+[\n] print();
+
+%%
+
+
+
+int main() {
+
+	printf("Enter a sentence: ");
+
+	yylex();
+
+	return 0;
+
+}
+
+4.Write a Lex program to count the frequency of the given word in a file.
+%{
+
+#include<stdio.h>
+
+char *word;
+
+int freq=0;
+
+%}
+
+
+
+DELIM [ \n\t\r]
+
+
+
+%%
+
+[^ \n]+ {if(strcmp(word,yytext)==0) freq++;}
+
+{DELIM} ;
+
+%%
+
+
+
+int main(int argc,char *argv[]) {
+
+	if(argc != 3) {
+
+		printf("Usage: ./a.out <filename> <word>\n");
+
+		return 0;
+
+	}
+
+	extern FILE *yyin,*yyout;
+
+	yyin=fopen(argv[1],"r");
+
+	word=argv[2];
+
+	yylex();
+
+	printf("Frequency of %s in file %s : %d\n",word,argv[1],freq);
+
+	return 0;
+
+}
+
+5.Write a Lex program to check perfect numbers.
+%{
+
+#include<stdio.h>
+
+%}
+
+
+
+%%
+
+[0-9]+ {
+
+	int num=atoi(yytext);
+
+	int sum=0;
+
+	for(int i=1;i<num;i++) {
+
+		if(num%i == 0) sum+=i;
+
+	}
+
+	if(sum==num) printf("%d is a perfect number\n",num);
+
+	else printf("%d is not a perfect number\n",num);
+
+}
+
+. {;}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter a number: ");
+
+	yylex();
+
+	return 0;
+
+}
+
+6.Write a LEX program that accepts the string having even numbers of ‘a’ over input alphabet {a, b}.
+%{
+
+#include<stdio.h>
+
+int cnt=0;
+
+%}
+
+
+
+%%
+
+a {cnt++;}
+
+b {;}
+
+\n {
+
+	if(cnt%2==0) printf("Accepted\n");
+
+	else printf("Rejected\n");
+
+}
+
+. {;}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter input string: ");
+
+	yylex();
+
+	return 0;
+
+}
+
+7.Write a LEX program which accepts odd number of 0’s and even number of 1’s.
+%{
+
+#include <stdio.h>
+
+int count0=0;
+
+int count1=0;
+
+%}
+
+
+
+%%
+
+0 {count0++;}
+
+1 {count1++;}
+
+\n {
+
+	if (count0%2==1 && count1%2==0) printf("Input accepted.\n");
+
+        else printf("Input rejected.\n");
+
+        count0=0;
+
+        count1=0;
+
+}
+
+
+
+. {;}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter input: ");
+
+    	yylex();
+
+    	return 0;
+
+}
+
+8.Write a LEX program which accepts strings ending with 11.
+%{
+
+#include<stdio.h>
+
+%}
+
+
+
+%%
+
+[01]*11 {printf("Accepted");}
+
+.* {printf("Rejected");}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter the input: ");
+
+	yylex();
+
+	return 0;
+
+}
+
+9.Write a Lex program for checking a valid URL.
+%{
+
+#include <stdio.h>
+
+%}
+
+
+
+%%
+
+[a-zA-Z]+:\/\/[a-zA-Z0-9\-_]+(\.[a-zA-Z0-9\-_]+)*\/?[a-zA-Z0-9\-\._\?\,\'\/\\\+&%\$#\=~]*    {printf("Accepted\n");}
+
+.*	{printf("Rejected\n");}                                                                                     
+
+%%
+
+
+
+int main() {
+
+	printf("Enter a URL: ");
+
+    	yylex();
+
+    	return 0;
+
+}
+
+10.Write a Lex program to check valid email.
+%{
+
+#include <stdio.h>
+
+%}
+
+
+
+%%
+
+[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,} {printf("Accepted\n");}
+
+.* {printf("Rejected\n");}
+
+%%
+
+
+
+int main() {
+
+	printf("Enter an email: ");
+
+    	yylex();
+
+    	return 0;
+
+}
+
+
+
+CYK ALGO IN C
+/* this is a basic implementation of CYK Algorithm */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX_SIZE 500
+
+struct rules
+{
+	char *var,*der;
+}*r;
+
+int n;
+
+struct set
+{
+	int sz;
+	char* ele;
+};
+
+struct Triplet
+{
+	char c;
+	int x,y;
+}; // stores the character along with the coordinates
+
+struct queue
+{
+	int f,r;
+	struct Triplet ele[MAX_SIZE];
+};
+
+struct queue q;
+
+void enqueue(char c,int x,int y)
+{
+	if(q.f==-1)
+		q.f = 0;
+	q.r = (q.r+1)%MAX_SIZE;
+	q.ele[q.r].c = c;
+	q.ele[q.r].x = x;
+	q.ele[q.r].y = y;
+	//q.ele[q.r].z = z;
+}
+
+struct Triplet dequeue()
+{
+	struct Triplet rtn = q.ele[q.f];
+	q.f = (q.f+1)%MAX_SIZE;
+	if(q.f==(q.r+1)%MAX_SIZE)
+		q.f = q.r = -1;
+	return rtn;
+}
+
+int present(struct set* m,char c)
+{
+	int i;
+	for(i=0;i<m->sz;i++)
+	{
+		if(m->ele[i]==c)
+			return 1;
+	}
+	return 0;
+}
+
+void find(struct set* m,char* a,int first)
+{
+	int i,j;
+	if(first)
+	{
+		m->sz = 0;
+		m->ele = (char*)malloc(sizeof(char)*n);
+	}
+	for(i=0;i<n;i++)
+	{
+		if(strcmp(r[i].der,a)==0)
+		{
+			if(first||(!first&&!present(m,r[i].var[0])))
+			m->ele[m->sz++] = r[i].var[0];
+		}
+	}
+}
+
+void cross_product(struct set* m1,struct set* m2,struct set* m3)
+{
+	int i,j;
+	char helper[3];
+	for(i=0;i<m2->sz;i++)
+	{
+		for(j=0;j<m3->sz;j++)
+		{
+			helper[0] = m2->ele[i];
+			helper[1] = m3->ele[j];
+			helper[2] = '\0';
+			find(m1,helper,0);
+		}
+	}
+}
+
+
+
+void create_array(struct set*** m,int i,int j,int s)
+{
+	int i1,i2,k,d=1;
+	(*m)[i][j].sz = 0;
+	(*m)[i][j].ele = NULL;
+	(*m)[i][j].ele = (char*)malloc(sizeof(char)*n);
+	for(i1=s-1;i1>i;i1--)
+	{
+		cross_product(&((*m)[i][j]),&((*m)[i1][j]),&((*m)[i+d][j+d]));
+		d++;
+	}
+}
+
+
+int find1(char c,char* a)
+{
+	int i;
+	for(i=0;i<n;i++)
+	{
+		if(strcmp(r[i].der,a)==0&&r[i].var[0]==c)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void print(struct Triplet* arr,int m)
+{
+	int i;
+	for(i=0;i<m;i++)
+	{
+		printf("%c",arr[i].c);
+	}
+}
+
+void print_sequence(struct set** m,char* a,int l)
+{
+	int i,j,k,d;
+	/*q.f = q.r = -1;
+	enqueue('S',0,0);
+	enqueue('|',-1,-1); // this is a special symbol
+	struct Triplet helper,inp;
+	char arr[l+1];int ind=0,ps = 1;
+	arr[0] = 'S';
+	arr[1] = '\0';*/
+	struct Triplet arr[l];
+	int ind = 0,ps = 1;
+	arr[0].c = 'S';
+	arr[0].y = arr[0].x = 0;
+	printf("S --> ");
+	while(ind<l)
+	{
+		//printf("*");
+		// helper = dequeue();
+		// if(helper.c=='|')
+		// {
+		// 	if(q.f!=-1||q.r!=-1)
+		// 	{
+		// 		enqueue('|',-1,-1);
+		// 	}
+		// 	ind = (ind+1)%ps;
+		// }
+		struct Triplet helper;
+		helper = arr[ind];
+		if(helper.x<l-1)
+		{
+			d = 1;
+			char dummy[3];
+			int f = 0;
+			for(i=l-1;i>helper.x&&!f;i--)
+			{
+				//printf("sizes = %d %d\n",m[i][helper.y].sz,m[helper.x+d][helper.y+d].sz);
+				for(j=0;j<m[i][helper.y].sz&&!f;j++)
+				{
+					for(k=0;k<m[helper.x+d][helper.y+d].sz&&!f;k++)
+					{
+						dummy[0] = m[i][helper.y].ele[j];
+						dummy[1] = m[helper.x+d][helper.y+d].ele[k];
+						dummy[2] = '\0';
+						if(find1(helper.c,dummy))
+						{
+						//	printf("found dummy = %s\n",dummy);
+							f = 1;
+							//enqueue(dummy[0],i,helper.y);
+							//enqueue(dummy[1],helper.x+d,helper.y+d);
+							int j1 = ps;
+							while(j1>ind+1)
+							{
+								arr[j1] = arr[j1-1];
+								j1--;
+							}
+							arr[ind].c = dummy[0];
+							arr[ind].x = i;
+							arr[ind].y = helper.y;
+							arr[ind+1].c = dummy[1];
+							arr[ind+1].x = helper.x+d;
+							arr[ind+1].y = helper.y+d;
+							ps++;
+							//arr[ps] = '\0';
+						}
+					}
+				}
+				d++;
+			}
+			print(arr,ps);
+			printf(" --> ");
+		}
+		else
+		{
+			arr[ind].c = a[helper.y];
+			//arr[ps] = '\0';
+			ind = ind+1;
+			print(arr,ps);
+			printf(" --> ");
+		}
+		
+	}
+	printf("%s\n",a);
+}
+
+int main()
+{
+	int i,j,k;
+	printf("Enter number of rules\n");
+	scanf("%d",&n);
+	r = NULL;
+	r = (struct rules*)malloc(sizeof(struct rules)*n);
+	char input[50];
+	for(i=0;i<n;i++)
+	{
+		r[i].var = NULL;
+		r[i].der = NULL;
+		r[i].var = (char*)malloc(sizeof(char)*2);
+		r[i].der = (char*)malloc(sizeof(char));
+		scanf("%s",input);
+		r[i].var[0] = input[0];
+		strcpy(r[i].der,input+1);
+	}
+	/*for(i=0;i<n;i++)
+	{
+		printf("%s --> %s\n",r[i].var,r[i].der);
+	}*/
+	printf("Enter the string to be tested\n");
+	scanf("%s",input);
+	int m = strlen(input);
+	struct set **mat; // the 3D table for storing all values
+	mat = NULL;
+	mat = (struct set**)malloc(sizeof(struct set*)*m);
+	for(i=0;i<m;i++)
+	{
+		mat[i] = NULL;
+		mat[i] = (struct set*)malloc(sizeof(struct set)*m);
+	}
+
+	// initializing the lower row
+	char helper[2];
+	for(i=0;i<m;i++)
+	{
+		helper[0] = input[i];
+		helper[1] = '\0';
+		mat[m-1][i].ele = NULL;
+		find(&mat[m-1][i],helper,1);
+	}
+
+	// the crutial part!!
+
+	for(i=m-2;i>=0;i--)
+	{
+		for(j=0;j<i+1;j++)
+		{
+			create_array(&mat,i,j,m);
+		}
+	}
+	printf("The lookup table = \n");
+	for(i=0;i<m;i++)
+	{
+		for(j=0;j<i+1;j++)
+		{
+			for(k=0;k<mat[i][j].sz;k++)
+			{
+				printf("%c,",mat[i][j].ele[k]);
+			}
+			if(mat[i][j].sz==0)
+				printf(" @ ");
+			printf(" | ");
+		}
+		printf("\n");
+	}
+	if(present(&mat[0][0],'S'))
+	{
+		printf("\nThe string belongs to this CFG\n\n");
+		print_sequence(mat,input,m);
+	}
+	else
+	{
+		printf("The string doesn't belong to this CFG\n");
+	}
+
+	// printing the derivation sequence
+
+	return 0;
+}
+
+HEXADECIMAL TO DEC
+/* HEX to DEC */
+
+%{
+
+int toInt(char* str);
+
+%}
+
+%%
+
+[0-9A-F]+ {printf("%d\n",toInt(yytext));}
+. 
+\n
+%%
+
+int toInt(char* str)
+{
+	char* p;
+	p = str;
+	int i = 0;
+	while(*p!='\0'&&*p=='0')
+	p++;
+	while(*p!='\0')
+	{
+		i = (i*16)+(((*p>='0')&&(*p<='9'))?(*p-'0'):(*p-'A'+10));
+		p++;
+	}	
+	return i;
+}
+
+int main()
+{
+	yylex();
+	return 0;
+}
+
+
+ASS4 YACC
+1. YACC program to implement a Calculator and recognize a valid Arithmetic
+expression.
+cal.l
+%{
+
+#include<stdio.h>
+
+#include "y.tab.h"
+
+extern int yylval;
+
+%}
+
+
+
+%%
+
+[0-9]+ {
+
+yylval=atoi(yytext);
+
+return NUMBER;
+
+}
+
+[\t] ;
+
+[\n] return 0;
+
+. return yytext[0];
+
+%%
+
+
+
+int yywrap() {
+
+return 1;
+
+}
+
+cal.y
+%{
+
+#include<stdio.h>
+
+int flag=0;
+
+int yylex();
+
+void yyerror();
+
+%}
+
+%token NUMBER;
+
+%left '+' '-'
+
+%left '*' '/' '%'
+
+%left '(' ')'
+
+S
+
+%%
+
+ArithmeticExpression: E{
+
+	printf("\nResult = %d\n",$$);
+
+	return 0;
+
+};
+
+
+
+E:E '+' E {$$=$1+$3;}
+
+|E '-' E {$$=$1-$3;}
+
+|E '*' E {$$=$1*$3;}
+
+|E '/' E {$$=$1/$3;}
+
+|E '%' E {$$=$1%$3;}
+
+|'('E')' {$$=$2;}
+
+| NUMBER {$$=$1;}
+
+;
+
+%%
+
+
+
+void main() {
+
+	printf("\nEnter an Arithmetic Expression: \n");
+
+	yyparse();
+
+	if(flag==0) printf("\nArithmetic Expression is Valid\n");
+
+}
+
+
+
+void yyerror() {
+
+	printf("\nArithmetic Expression is Invalid\n\n");
+
+	flag=1;
+
+}
+
+2.YACC program to recognize strings of { anb | n≥5 }
+q2.l
+%{
+
+#include<stdio.h>
+
+#include "y.tab.h"
+
+%}
+
+
+
+%%
+
+[a] return A;
+
+[b] return B;
+
+%%
+
+q2.y
+%{
+
+#include<stdio.h>
+
+int yylex();
+
+void yyerror(char *s);
+
+%}
+
+
+
+%token A B
+
+
+
+%%
+
+stat: exp B
+
+;
+
+exp: A A A A exp1
+
+;
+
+exp1: A exp2
+
+|A
+
+|A A exp2
+
+;
+
+exp2: A
+
+;
+
+%%
+
+
+
+int main() {
+
+	printf("Enter the string: ");
+
+	if(yyparse()==0) {
+
+		printf("Valid string\n");
+
+	}
+
+}
+
+void yyerror(char *s) {
+
+	printf("Invalid string\n");
+
+}
+
+3.YACC program which accept strings that starts and ends with 0 or 1
+q3.l
+%{
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+#include "y.tab.h"
+
+%}
+
+
+
+%%
+
+[' '\t] {;}
+
+"0" {
+
+	yylval=0;
+
+	return(ZERO);
+
+    }
+
+"1" {
+
+	yylval=1;
+
+	return(ONE);
+
+    }  
+
+. {return(OTHERS);}
+
+\n {return 0;}
+
+%%
+
+q3.y
+%{
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+int yylex();
+
+void yyerror(const char *s);
+
+%}
+
+
+
+%start start
+
+%token ONE
+
+%token ZERO
+
+%token OTHERS
+
+
+
+%%
+
+start: E{printf("Accepted\n");};
+
+E: ONE|ZERO|ONE A|ZERO B;
+
+A: ONE|ONE A|ZERO A|OTHERS A;
+
+B: ZERO|ZERO B|ONE B|OTHERS B;
+
+%%
+
+
+
+int main() {
+
+	printf("Enter the string: ");
+
+	return (yyparse());
+
+}
+
+
+
+void yyerror(const char *s) {
+
+	printf("Rejected\n");
+
+}
+
+int yywrap() {
+
+	return 1;
+
+}
+
+4.YACC program for Conversion of Infix to Postfix expression
+q4.l
+%{
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+#include "y.tab.h"
+
+extern int yylval;
+
+%}
+
+
+
+%%
+
+[0-9]+ {yylval=atoi(yytext);return(NUMBER);}
+
+[\+\-\*\/\^\%] {return(yytext[0]);}
+
+[\t' '] {;}
+
+\n {return 0;}
+
+%%
+
+q4.y
+%{
+
+#include<stdio.h>
+
+int yylex();
+
+void yyerror(char *s);
+
+%}
+
+%start start
+
+%token NUMBER
+
+%left '-' '+'
+
+%left '*' '/' '%'
+
+%left '(' ')'
+
+%right UMINUS '^'
+
+%%
+
+start: E{printf(" is the Postfix Expression\n");}
+
+E: 
+
+	 E '^' E {printf("^");}
+
+	|E '*' E {printf("*");}
+
+	|E '%' E {printf("%%");}
+
+	|E '/' E {printf("/");}
+
+	|E '+' E {printf("+");}
+
+	|E '-' E {printf("-");}
+
+	|'-' E %prec UMINUS {{printf("-");}}
+
+	|'(' E ')'
+
+	| number
+
+	;
+
+number: NUMBER {printf("%d",yylval);}
+
+	;
+
+%%
+
+int main() {
+
+	printf("Enter the Infix Expression: ");
+
+	return (yyparse());
+
+}
+
+void yyerror(char *s) {
+
+	fprintf(stderr,"%s\n",s);
+
+}
+
+int yywrap() {
+
+	return 1;
+
+}
+
+5.Write appropriate program in Lex and Yacc that it can verify a given C program with
+general syntax [ Like Include headers, Main function, if, while, printf, and scanf ].
+q5.l
+%{
+
+#include <stdio.h>
+
+#include <stdlib.h>
+
+#include "y.tab.h"
+
+int yylval;
+
+%}
+
+
+
+/* Regular expressions for tokens */
+
+%option noyywrap
+
+%%
+
+[ \t]               ; /* ignore whitespace */
+
+\n                  { return EOL; }
+
+"#include"          { return INCLUDE; }
+
+"int"|"void"|"char" { return DATATYPE; }
+
+"main"              { return MAIN; }
+
+"if"                { return IF; }
+
+"else"              { return ELSE; }
+
+"while"             { return WHILE; }
+
+"printf"            { return PRINTF; }
+
+"scanf"             { return SCANF; }
+
+"+"|"-"|"*"|"/"|"=" { return OPERATOR; }
+
+"("                 { return LEFTPAREN; }
+
+")"                 { return RIGHTPAREN; }
+
+"{"                 { return LEFTBRACE; }
+
+"}"                 { return RIGHTBRACE; }
+
+\"[^\"]*\"          { return STRING; }
+
+[_a-zA-Z][_a-zA-Z0-9]* { yylval = atoi(yytext); return IDENTIFIER; }
+
+[0-9]+              { yylval = atoi(yytext); return CONSTANT; }
+
+.                   { printf("Invalid character: %s\n", yytext); }
+
+%%
+
+q5.y
+%{
+
+#include <stdio.h>
+
+#include <stdlib.h>
+
+#include <string.h>
+
+int yylex(void);
+
+void yyerror(char *s);
+
+int line_number = 1;
+
+%}
+
+
+
+/* Token definitions */
+
+%token EOL INCLUDE DATATYPE MAIN IF ELSE WHILE PRINTF SCANF OPERATOR LEFTPAREN RIGHTPAREN LEFTBRACE RIGHTBRACE STRING IDENTIFIER CONSTANT
+
+
+
+/* Production rules */
+
+%start program
+
+%%
+
+program : header main_function 
+
+        { printf("Valid C program\n"); }
+
+        ;
+
+header  : INCLUDE STRING EOL header
+
+        | /* empty */
+
+        ;
+
+main_function : DATATYPE MAIN LEFTPAREN RIGHTPAREN LEFTBRACE statements RIGHTBRACE
+
+        ;
+
+statements : statement EOL statements
+
+           | statement
+
+           | /* empty */
+
+           ;
+
+statement  : assignment
+
+           | printf_statement
+
+           | scanf_statement
+
+           | if_statement
+
+           | while_statement
+
+           ;
+
+assignment : IDENTIFIER OPERATOR CONSTANT
+
+           ;
+
+printf_statement : PRINTF LEFTPAREN STRING RIGHTPAREN
+
+                 | PRINTF LEFTPAREN STRING IDENTIFIER RIGHTPAREN
+
+                 ;
+
+scanf_statement : SCANF LEFTPAREN STRING IDENTIFIER RIGHTPAREN
+
+                ;
+
+if_statement : IF LEFTPAREN IDENTIFIER OPERATOR CONSTANT RIGHTPAREN LEFTBRACE statements RIGHTBRACE ELSE LEFTBRACE statements RIGHTBRACE
+
+             | IF LEFTPAREN IDENTIFIER OPERATOR CONSTANT RIGHTPAREN LEFTBRACE statements RIGHTBRACE
+
+             ;
+
+while_statement : WHILE LEFTPAREN IDENTIFIER OPERATOR CONSTANT RIGHTPAREN LEFTBRACE statements RIGHTBRACE
+
+                ;
+
+%%
+
+void yyerror(char *s) {
+
+    printf("Error: %s at line %d\n", s, line_number);
+
+}
+
+
+
+int main(void) {
+
+	yyparse();
+
+	return 0;
+
+}
+
+ASS5
+Q: Write a Lex and Yacc program to check syntax analyzer and Semantic
+analysis for "for loop". Check all the possible rules are covered or not
+including variable declaration, break statements, continue statement and exit
+function and cross verify other requirements for for loop.
+CODE:
+forloop.l
+%{
+#include<stdio.h>
+#include"y.tab.h"
+#include<math.h>
+%}
+%%
+"void"|"char"|"short"|"int"|"long"|"float"|"double" {return TYPE;}
+"for" {return FOR;}
+"if" {return IF;}
+"else" {return ELSE;}
+"printf" {return PRINTF;}
+"scanf" {return SCANF;}
+"break" {return BREAK;}
+"continue" {return CONTINUE;}
+"||" {return or;}
+"&&" {return and;}
+"==" {return eq;}
+"++"|"--" {return unary;}
+";"|"="|","|"{"|"}"|"("|")"|"["|"]"|"*"|"+"|"-
+"|"/"|"?"|":"|"&"|"|"|"^"|"!"|"~"|"%"|"<"|">" {return yytext[0];}
+[0-9]+ {return int_const;}
+[0-9]+"."[0-9]+ {return float_const;}
+"'"."'" {return char_const;}
+[a-zA-z_][a-zA-z_0-9]* {return id;}
+\"(\\.|[^\"])*\" {return string;}
+[ \t\n] ;
+%%
+int yywrap() {
+return 1;
+}
+
+forloop.y 
+%{ #include<stdio.h> int yylex(void); int yyerror(const char *s); int error = 0; %} 
+%token id string TYPE int_const char_const float_const PRINTF SCANF 
+%token IF FOR RETURN or and eq BREAK CONTINUE 
+%token ELSE unary 
+%left '+' '-' 
+%left '*' '/' 
+
+%% 
+for_loop : FOR '(' statement ';' conditions ';' expression ')' block; 
+statements : routine statements | statement ';' statements | ; 
+routine : ifstmt | ifelse | for_loop ; 
+statement : declaration | expression | BREAK | CONTINUE ; 
+ifstmt : IF '(' conditions ')' block; 
+ifelse : IF '(' conditions ')' block ELSE block; 
+declaration : TYPE id init ; 
+init : '=' expression | ; 
+expression :id'='expression|E','E| E | ; 
+E : E '+' T | E '-' T | T; T : T '*' F | T '/' F | F; 
+F : '(' E ')' | var | printf | scanf ; 
+value : int_const | char_const | float_const; 
+conditions : condition conj conditions | '(' conditions ')' | condition ; 
+conj : or | and; condition : E binary_op E | ; 
+var : unary id | id unary | id | value; 
+binary_op :or|and|eq|'<'|'>'|'>''='|'<''='; 
+block : '{' statements '}' | statement ';'; 
+printf : PRINTF '(' string args ')'; 
+scanf : SCANF '(' string args ')'; 
+args : arg args |; arg : ',' 
+printable; printable: '&'id|'*'id|id; 
+%%
+
+int main() { yyparse(); if(error) printf("Parsing Failed. Syntax error.\n"); else printf("Parsing Successful.\n"); return 0; } 
+int yyerror(const char *msg) { error = 1; return 0; }
+
+ASS7 LAST 10 QUESTIONS
+
+COMPILE STEPS:
+lex q1.l
+yacc -d q2.y
+gcc lex.yy.c y.tab.c -ll
+./a.out
+
+1.Write a program to design LALR parsing using YACC.
+q1.l
+%{
+#include<stdio.h>
+#include<string.h>
+#include "y.tab.h"
+void yyerror(char *);
+char id[50][50];
+int total_id=0;
+int lineNo=0;
+%}
+DIGIT [0-9]
+LETTER [a-zA-Z]
+MULOP [*/%]
+ADDOP [+-]
+%%
+"if" {yyerror("No rules for if");}
+"else" {yyerror("No rules for if");}
+"while" {yyerror("No rules for if");}
+"for" {yyerror("No rules for if");}
+"repeat" {yyerror("No rules for if");}
+"until" {yyerror("No rules for if");}
+"return" {yyerror("No rules for return");}
+"main" {yyerror("No rules for main");}
+{LETTER}({LETTER}|{DIGIT}|"_")({LETTER}|{DIGIT}|"_")({LETTER}|{DIGIT}|"_")({LETTER}|{D
+IGIT}|"_")({LETTER}|{DIGIT}|"_")+ {
+{yyerror("Identifier greater than 5 characters");}
+}
+{LETTER}({LETTER}|{DIGIT}|"_")?({LETTER}|{DIGIT}|"_")?({LETTER}|{DIGIT}|"_")?({LETTER}
+|{DIGIT}|"_")? {
+int i=0;
+int flag=0;
+for(i=0;i<total_id;i++) {
+if(strcmp(id[i],yytext) == 0) {
+flag=1;
+break;
+NATIONAL INSTITUTE OF TECHNOLOGY
+WARANGAL-506004
+DEPARTMENT OF COMPUTER SCIENCE
+AND ENGINEERING
+CSE III B.TECH, SECTION-B
+} } if(flag == 0) { if(total_id == 0) puts(""); printf("\r%s\n",yytext); strcpy(id[total_id++],yytext); } return ID; } {DIGIT}+|({DIGIT}+("."){DIGIT}+) {return NUM;} "=="|">="|"<="|">"|"<"|"!=" {return RELOP;} {ADDOP}|("||") {return ADDOP;} {MULOP}|("&&") {return MULOP;} "=" {return ASSIGN;} ";" {return END;} "!" {return NOT;} "[" {return SQRBO;} "]" {return SQRBC;} "(" {return STRBO;} ")" {return STRBC;} "\n" {lineNo++;} [._]+ {yyerror("Invalid character");} %%
+
+q1.y
+%{ #include<stdio.h> #include<string.h> int yylex(); int yyerror(char *str); extern FILE *yyin; extern int lineNo; int ErrorRecovered=0; char msg[100]; %} 
+%start start 
+%token ID NUM RELOP ADDOP MULOP ASSIGN NOT SQRBO SQRBC STRBO STRBC END NEWLINE 
+%% 
+
+start : statement_list; 
+statement_list: statement{strcpy(msg,"Missing expression.");} | statement_list END statement{strcpy(msg,"It is not the last line of file.");}; 
+statement: Variable ASSIGN Expression{strcpy(msg,"Variable or expression missing.");}; 
+Variable: ID{strcpy(msg,"Expecting something else.");} | ID SQRBO Expression SQRBC{strcpy(msg,"'[' or ']' missing OR expression missing.");}; 
+Expression: Simple_Expression{strcpy(msg,"Missing expression.");} |
+Simple_Expression RELOP Simple_Expression{strcpy(msg,"Conditional operation cannot be done.");}; 
+Simple_Expression: Term{} | Simple_Expression ADDOP Term{strcpy(msg,"Addition operation cannot be done.");}; 
+Term: Factor{} | Term MULOP Factor{strcpy(msg,"Multiplication operation cannot be done.");}; 
+Factor: ID{strcpy(msg,"Expecting something else.");} | NUM{strcpy(msg,"Unrecognized number format.");} | STRBO Expression STRBC{strcpy(msg,"'(' or ')' missing OR expression not found.");}; | ID SQRBO Expression SQRBC{strcpy(msg,"'[' or ']' missing OR ID not found");}; | NOT Factor; 
+%% 
+
+int main() { yyin=fopen("207201input.txt","r"); yyparse(); fclose(yyin); if(ErrorRecovered == 0) printf("SUCCESS\n"); return 0; } 
+int yyerror(char *str) { if(ErrorRecovered == 0) { printf("Error found @ line #%d: ",lineNo+1); if(strcmp(str,"Invalid character") == 0 || strcmp(str,"Identifier greater than 5 characters") == 0) printf("%s",str); else if(strlen(msg)) printf("%s\n",msg); else printf("%s\n",str); } printf("\n"); ErrorRecovered = 1; } 
+int yywrap() { return 1; }
+
+input.txt
+a=1;
+
+b=2;
+
+c=12;
+
+a+b+c=0;
+
+2.Write a program in YACC to convert binary to decimal (including fractional numbers).
+q2.l
+%{ #include "y.tab.h" %} 
+
+%% 
+[0-1]+ { yylval.num = strtol(yytext, NULL, 2); return INTEGER; } 
+[0-1]*\.[0-1]+ { yylval.fnum = atof(yytext); return FLOAT; } 
+[ \t\n] ; /* skip whitespace */ . { return yytext[0]; } 
+%% 
+int yywrap() { return 1; }
+
+q2.y
+%{ #include <stdio.h> #include <stdlib.h> int yylex(); void yyerror(char *s); %} 
+%union { int num; float fnum; } 
+%start program 
+%token<num> INTEGER 
+%token<fnum> FLOAT 
+%type<num> statement 
+%type<num> expr 
+%left '+' '-' 
+8%left '*' '/'
+
+%% 
+program: | program statement '\n'; 
+statement: expr { printf("%d\n", $1); }; 
+expr: INTEGER { $$ = $1; } | FLOAT { $$ = $1; } | expr '+' expr { $$ = $1 + $3; } | expr '-' expr { $$ = $1 - $3; } | expr '*' expr { $$ = $1 * $3; } | expr '/' expr { $$ = $1 / $3; } ; 
+%%
+ int main() { yyparse(); return 0; } 
+void yyerror(char *s) { fprintf(stderr, "%s\n", s); }
+
+4.Write a program to generate a symbol table using words in a given 
+English text. Also include rules to recognise words like “can’t” as a single word. 
+Use a normal table for storing words, their frequency and unique line 
+numbers in which the word appears.
+
+%option noyywrap yylineno nodefault case-insensitive 
+%{ #include<bits/stdc++.h> using namespace std; struct row { int count; vector<int>linenum; }; map <string,struct row> table; map <string,struct row>::iterator it; int i=1; char* file; %} 
+%%
+ [a-z]+(\'(s|t))? { string ss=yytext; if(table.find(ss)==table.end()) { vector<int> v; v.push_back(i); struct row r; r.count=1; r.linenum=v; table[ss]=r; } else { table[ss].count++;
+int k=table[ss].linenum.size(); if(table[ss].linenum[k-1]!=i) { table[ss].linenum.push_back(i); } } } 
+<<EOF>> { yyterminate();} \n {i++;} . { string ss=yytext; if(table.find(ss)==table.end()) { vector<int> v; v.push_back(i); struct row r; r.count=1; r.linenum=v; table[ss]=r; } else { table[ss].count++; int k=table[ss].linenum.size(); if(table[ss].linenum[k-1]!=i) { table[ss].linenum.push_back(i); } } } 
+%% 
+void show() 
+{ for(it=table.begin();it!=table.end();it++) { cout<<it->first<<"\t"<<it->second.count<<"\t"; for(int j=0;j<it->second.linenum.size();j++) { cout<<it->second.linenum[j]<<" "; } cout<<endl; } } 
+int main(int argc,char* argv[]) { extern FILE *yyin; yyin=fopen("207201.txt","r"); yylex(); show(); return 0; }
+
+5.Q5: Write a program to find LR(0) items for the following expression grammar and construct SLR table assuming that the operators ‘+’ and ‘*’ are right associative and + has higher precedence than *
+E → E + E | E * E | (E) | id
+NOTE- I am taking ‘id’ as ‘i’
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+
+
+map<char,vector<string> > productions;
+
+map<char,vector<char> > first,follows;
+
+vector<vector<pair<char, string> > > itemsets;
+
+map<pair<int, char>, int> goto1;
+
+map<pair<int, char>,vector< string> >action;
+
+vector<char> terms;
+
+
+
+void find_first(string s, vector<char> &first_set,char l) {
+
+	if(s[0]=='0') {
+
+		first_set.push_back(s[0]); 
+
+		return;
+
+	}
+
+	else if(s[0]!=l) {
+
+		int flag=0;
+
+		for(int i=0; i<s.size(); i++) {
+
+			if(!(s[i]<='Z' && s[i]>='A')) {
+
+				first_set.push_back(s[i]); 
+
+				return;
+
+			}
+
+			else {
+
+				vector<char> tmp_first_vec;
+
+				for(int j=0; j<productions[s[i]].size(); j++) {
+
+					if(productions[s[i]][j]!=s) {
+
+						find_first(productions[s[i]][j],tmp_first_vec,s[i]);
+
+					}
+
+				}
+
+				flag=1;
+
+				for(int j=0;j<tmp_first_vec.size(); j++) {
+
+					if(tmp_first_vec[j]!='0') {
+
+						if(find(first_set.begin(),first_set.end(),tmp_first_vec[j])==first_set.end())
+
+						first_set.push_back(tmp_first_vec[j]);
+
+					}
+
+					else
+
+					flag=0; 
+
+				}
+
+			}
+
+			if(flag==1)
+
+			break;
+
+		}
+
+		if(flag==0)
+
+		first_set.push_back('0');
+
+	}
+
+}
+
+
+
+void build_first() {
+
+	map<char,vector<string> >::iterator it;
+
+	for(it=productions.begin();it!=productions.end();it++) {
+
+		vector<char> first_set;		
+
+		for(int j=0;j<it->second.size();j++) {
+
+			find_first(it->second[j],first_set,it->first);
+
+		}
+
+		for(int j=0;j<first_set.size();j++)
+
+		first[it->first].push_back(first_set[j]);
+
+	}
+
+}
+
+
+
+void find_follow(char nont, vector<char> &follow_set, map<char,int> &visited,char s) {
+
+	if(s==nont)
+
+	follow_set.push_back('$');
+
+	map<char,vector<string> >::iterator it;
+
+	for(it=productions.begin();it!=productions.end();it++) {
+
+		if(visited[nont]!=1) {
+
+			visited[nont]=1;
+
+			for(int j=0;j<it->second.size();j++) {
+
+				if(it->second[j][0]=='0');
+
+				else {
+
+					int y=-1;
+
+					for(int k=0;k<it->second[j].length();k++) {
+
+						if(nont==it->second[j][k]) {
+
+							y=k;
+
+							break;
+
+						}
+
+					}
+
+					if(y!=-1) {
+
+						int flag=1;
+
+						for(int r=y+1;r<it->second[j].length();r++) {
+
+							if(flag==1) {
+
+								if(it->second[j][r]<='Z' && it->second[j][r]>='A') {
+
+									flag=0;
+
+									for(int k=0;k<first[it->second[j][r]].size();k++) {
+
+										if(first[it->second[j][r]][k]!='0' && find(follow_set.begin(),follow_set.end(),first[it->second[j][r]][k])==follow_set.end())
+
+											follow_set.push_back(first[it->second[j][r]][k]);
+
+										else if(first[it->second[j][r]][k]=='0')
+
+										flag=1;
+
+									}
+
+								}
+
+								else {
+
+									flag=0;
+
+									if(find(follow_set.begin(),follow_set.end(),it->second[j][r])==follow_set.end())
+
+									follow_set.push_back(it->second[j][r]);
+
+								}
+
+							}
+
+						}
+
+						if(flag==1 && it->first!=nont) {
+
+							vector<char> tmp_follow_vec;
+
+							if(nont!=it->first)
+
+							find_follow(it->first,tmp_follow_vec,visited,s);
+
+							for(int j=0;j<tmp_follow_vec.size(); j++) {
+
+								if(find(follow_set.begin(),follow_set.end(),tmp_follow_vec[j])==follow_set.end())
+
+								follow_set.push_back(tmp_follow_vec[j]);
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+			visited[nont]=0;
+
+		}
+
+	}
+
+}
+
+
+
+void build_follow(char s) {
+
+	map<char,vector<string> >::iterator it;
+
+	for(it=productions.begin();it!=productions.end();it++) {
+
+		map<char,int> visited;
+
+		map<char,vector<string> >::iterator it1;
+
+		for(it1=productions.begin();it1!=productions.end();it1++)
+
+		visited[it1->first]=0;
+
+		vector<char> follow_set;
+
+		find_follow(it->first, follow_set, visited,s);
+
+		for(int j=0;j<follow_set.size();j++)
+
+			follows[it->first].push_back(follow_set[j]);
+
+	}
+
+}
+
+
+
+vector<pair<char, string> > closure(vector<pair<char, string> > kernel_item) {
+
+	vector<pair<char, string> > ret;
+
+	vector<char> s1;
+
+	vector<string>  s2;
+
+	for(int i=0; i<kernel_item.size(); i++) {
+
+			s1.push_back(kernel_item[i].first);
+
+			s2.push_back(kernel_item[i].second);
+
+			ret.push_back(kernel_item[i]);
+
+	}
+
+	int i=0;
+
+	while(i<s1.size()) {
+
+		int pos=-1;
+
+		string str=s2[i];
+
+		for(int j=0; j<str.length(); j++) {
+
+			if(s2[i][j]=='.') {
+
+				pos = j;
+
+				break;
+
+			}
+
+		}
+
+		if(pos!=s2[i].length()-1 && s2[i][pos+1]!='0') {
+
+			char ch = s2[i][pos+1];
+
+			map<char,vector<string> >::iterator it1;
+
+			for(it1=productions.begin();it1!=productions.end();it1++) {
+
+				for(int j=0;j<it1->second.size();j++) {
+
+					string str=".";
+
+					str=str+it1->second[j];
+
+					if(it1->first==ch && find(s2.begin(),s2.end(),str)==s2.end()) {
+
+						s1.push_back(it1->first);
+
+						s2.push_back(str);
+
+						ret.push_back(make_pair(it1->first, str));
+
+					}
+
+				}
+
+			}
+
+		}
+
+		i++;
+
+	}
+
+	return ret;
+
+}
+
+
+
+void build_items(char sa) {
+
+	pair<char, string> curr_production;
+
+	curr_production.first=sa;
+
+	curr_production.second=productions[sa][0];
+
+	curr_production.second.insert(curr_production.second.begin(), '.');
+
+	vector<pair<char, string> > init; 
+
+	init.push_back(curr_production); 
+
+	itemsets.push_back(closure(init)); 
+
+	vector<vector<pair<char, string> > > s; 
+
+	s.push_back(closure(init)); 
+
+	int z=0;
+
+	while(z<s.size()) {
+
+		vector<pair<char, string> > now; 
+
+		now = s[z]; 
+
+		z++;
+
+		int index = 0;
+
+		for(int i=0; i<itemsets.size(); i++) {
+
+			if(now==itemsets[i]) {
+
+				index = i; 
+
+				break;
+
+			}
+
+		}
+
+		int u=0;
+
+		vector<char> k1;
+
+		vector< vector<pair<char, string> > > kernels;
+
+		for(int i=0; i<now.size(); i++) {
+
+			string rhs = now[i].second;
+
+			for(int j=0; j<rhs.size(); j++) {
+
+				if(rhs[j]=='.' && j!=rhs.size()-1) {
+
+					swap(now[i].second[j], now[i].second[j+1]);
+
+					int p=-1;
+
+					for(int w=0;w<u;w++) {
+
+						if(k1[w]==now[i].second[j])
+
+						p=w;
+
+					}
+
+					if(p!=-1)
+
+					kernels[p].push_back(now[i]);
+
+					else {
+
+						u++;
+
+						vector<pair<char, string> > k2;
+
+						k2.push_back(now[i]);
+
+						kernels.push_back(k2);
+
+						k1.push_back(now[i].second[j]);
+
+					}
+
+				}
+
+			}
+
+		}
+
+		for(int it=0; it<u; it++) {
+
+			vector<pair<char, string> > curr_close = closure(kernels[it]);
+
+			int flag = 0;
+
+			for(int i=0; i<itemsets.size(); i++) {
+
+				if(itemsets[i]==curr_close) {
+
+					goto1[make_pair(index, k1[it])] = i; 
+
+					flag = 1; 
+
+					break;
+
+				}
+
+			}
+
+			if(flag==0) {
+
+				goto1[make_pair(index, k1[it])] = itemsets.size();
+
+				itemsets.push_back(curr_close);
+
+				s.push_back(curr_close);
+
+			}
+
+		}
+
+	}
+
+}
+
+
+
+void build_actions(char sa) {
+
+	for(int i=0; i<itemsets.size(); i++) {
+
+		vector<char> termcpy = terms;
+
+		for(int j=0; j<itemsets[i].size(); j++) {
+
+			string tmp = itemsets[i][j].second;
+
+			for(int k=0; k<tmp.size(); k++) {
+
+				if(tmp[k]=='.' && k!=tmp.size()-1) {
+
+					if(!(tmp[k+1]>='A'&&tmp[k+1]<='Z')) {
+
+						stringstream ss; 
+
+						ss<<goto1[make_pair(i, tmp[k+1])];
+
+						string str="shift "+ss.str();
+
+						action[make_pair(i, tmp[k+1])].push_back(str);
+
+					}
+
+				}
+
+				if(tmp[k]=='.' && k==tmp.size()-1) {
+
+					if(itemsets[i][j].first==sa) {
+
+						string str="accept";
+
+                        action[make_pair(i, '$')].push_back(str); 
+
+						break;
+
+                    }
+
+					pair<char, string> reduce_this = itemsets[i][j];
+
+					reduce_this.second.erase(reduce_this.second.find('.'));
+
+						stringstream ss; 
+
+						ss<<"reduce "<<itemsets[i][j].first<<"->"<<reduce_this.second;
+
+					for(int it=0; it!=follows[itemsets[i][j].first].size(); it++)
+
+						action[make_pair(i,follows[itemsets[i][j].first][it])].push_back(ss.str());
+
+				}
+
+			}
+
+		} 
+
+	}
+
+}
+
+
+
+char lastop(stack<char> s,char c) {
+
+	char ch;
+
+	int l=-1,r=-1;
+
+	for(int i=s.size()-1;i>=0;i--) {
+
+		if(s.top()=='+' || s.top()=='*') {
+
+			ch=s.top();
+
+			if(ch=='+')
+
+			l=2;
+
+			else
+
+			l=1;
+
+			break;
+
+		}
+
+		s.pop();
+
+	}
+
+	if(c=='+')
+
+	r=2;
+
+	else
+
+	r=1;
+
+	if(l>r)
+
+	return 'r';
+
+	else
+
+	return 's';
+
+}
+
+
+
+void parse() {
+
+	string w;
+
+	cin>>w; 
+
+	w+='$';
+
+	char ch;
+
+	int i=0;
+
+	stack<int> s;
+
+	stack<char> s1;
+
+	s1.push('$');
+
+	s.push(0);
+
+	cout<<"\nParsing actions:\n";
+
+	cout<<"String is:"<<w<<"\n";
+
+	while(1) {
+
+		string acc;
+
+		cout << "ACTION[" << s.top() << ", " <<w[i]<<"]\t";
+
+		if(action[make_pair(s.top(), w[i])].size()==1)
+
+		acc=action[make_pair(s.top(), w[i])][0];
+
+		else {
+
+			ch=lastop(s1,w[i]);
+
+			if(action[make_pair(s.top(), w[i])][0][0]==ch)
+
+			acc=action[make_pair(s.top(), w[i])][0];
+
+			else
+
+			acc=action[make_pair(s.top(), w[i])][1];
+
+		}
+
+		if(acc[0]=='s') {
+
+			cout<<acc<<endl;
+
+			string tmp; 
+
+			for(int j=6; j<acc.size(); j++)
+
+			tmp+=acc[j]; 
+
+			s.push(atoi(tmp.c_str()));
+
+			s1.push(w[i]); 
+
+			i++;
+
+		}
+
+		else if(acc[0]=='r') {
+
+			cout<<acc;
+
+			char lhs=acc[7]; 
+
+			string rhs;
+
+			for(int j=10; j<acc.size(); j++)
+
+			rhs+=acc[j];
+
+			//cout<<rhs<<" ";
+
+			int popoff=rhs.size();
+
+			while(popoff--) {
+
+				s.pop();
+
+				s1.pop();
+
+			}
+
+			s.push(goto1[make_pair(s.top(), lhs)]);
+
+			s1.push(lhs);
+
+			cout<<endl;
+
+		}
+
+		else if(acc=="accept") {
+
+			cout<<"Accepted"<<endl;
+
+			break;
+
+		}
+
+		else {
+
+			cout<<"Error()\n";
+
+			break;
+
+		}
+
+	}
+
+}
+
+int main() {
+
+	int n,in=0; 
+
+	vector<char> nonter;
+
+	vector<string> gra;
+
+	cout<<"Enter number of productions:"; 
+
+	cin>>n;
+
+	char s;
+
+	while(in<n) {
+
+		char lhs; 
+
+		string rhs,s2;
+
+		cin>>lhs;
+
+		cin>>rhs;
+
+		s2+=lhs;
+
+		s2+="->";
+
+		s2+=rhs;
+
+		gra.push_back(s2);
+
+		productions[lhs].push_back(rhs);
+
+		for(int i=0; i<rhs.size(); i++) {
+
+			if(!(rhs[i]>='A' && rhs[i]<='Z') && find(terms.begin(),terms.end(),rhs[i])==terms.end())
+
+			terms.push_back(rhs[i]);
+
+			else if(find(nonter.begin(),nonter.end(),rhs[i])==nonter.end())
+
+			nonter.push_back(rhs[i]);
+
+		}
+
+		if(in==0)
+
+		s=lhs;
+
+		in++;
+
+	}
+
+	terms.push_back('$');
+
+	build_first();
+
+	map<char,vector<char> >::iterator it;
+
+	cout<<"first:\n";
+
+	for(it=first.begin();it!=first.end();it++) {
+
+		cout<<it->first<<"-> ";
+
+		for(int j=0;j<it->second.size();j++) {
+
+			cout<<it->second[j]<<" ";
+
+		}
+
+		cout<<"\n";	
+
+	}
+
+	build_follow(s);
+
+	cout<<"\nfollow:\n";
+
+	for(it=follows.begin();it!=follows.end();it++) {
+
+		cout<<it->first<<"-> ";
+
+		for(int j=0;j<it->second.size();j++)  {
+
+			cout<<it->second[j]<<" ";
+
+		}
+
+		cout<<"\n";	
+
+	}
+
+	build_items(s);
+
+	cout<<"\nItemsets:\n";
+
+	for(int i=0; i<itemsets.size(); i++) {
+
+		cout << "\nI-" << i <<":\n";
+
+		for(int j=0; j<itemsets[i].size(); j++) {
+
+			cout<<itemsets[i][j].first<<"->"<<itemsets[i][j].second<<endl;
+
+		}
+
+	}
+
+	cout<<"\nGo to computations:\n\n";
+
+
+
+	map<pair<int, char>, int>::iterator it2;
+
+	for(it2=goto1.begin(); it2!=goto1.end(); it2++) {
+
+		cout<<"GOTO["<<(it2->first).first<<", "<<(it2->first).second<<"] = "<<it2->second<<endl;
+
+	}
+
+	build_actions(s);
+
+	cout<<"\nActions in parsing table:\n";
+
+	map<pair<int, char>, vector<string> >::iterator it3;
+
+	for(it3=action.begin(); it3!=action.end(); it3++) {
+
+		cout<<"ACTION["<<(it3->first).first<<", "<<(it3->first).second<<"] = ";
+
+		for(int j=0; j<it3->second.size(); j++) {
+
+			if(j!=0)
+
+			cout<<"\t";
+
+			cout<<it3->second[j];
+
+		}
+
+		cout<<"\n";
+
+	}
+
+	cout<<"item";
+
+	for(int i=0;i<terms.size();i++)
+
+	cout<<"\t"<<terms[i];
+
+	for(int i=0;i<nonter.size();i++)
+
+	cout<<"\t"<<nonter[i];
+
+	cout<<"\n";
+
+	for(int i=0; i<itemsets.size(); i++) {
+
+		cout<<i;
+
+		int k=0,l=0;
+
+		while(l==0) {
+
+			//cout<<"\t";
+
+			l=1;
+
+			for(int j=0;j<terms.size();j++) {
+
+				cout<<"\t";
+
+				if(action[make_pair(i,terms[j])].size()>k+1)
+
+				l=0;
+
+				if(action[make_pair(i,terms[j])].size()>k) {
+
+					string acc=action[make_pair(i,terms[j])][k];
+
+					if(acc[0]=='s') {
+
+						string tmp; 
+
+						for(int w=6; w<acc.size(); w++)
+
+						tmp+=acc[w];
+
+						cout<<"s"<<atoi(tmp.c_str());
+
+					}
+
+					else if(acc[0]=='r') {
+
+						cout<<acc[0]; 
+
+						string rhs;
+
+						int w;
+
+						for(w=7; w<acc.size(); w++)
+
+						rhs+=acc[w];
+
+						for(w=0;w<gra.size();w++) {
+
+							if(gra[w].compare(rhs)==0)
+
+							break;
+
+						}
+
+						cout<<w;
+
+					}
+
+					else if(acc=="accept") {
+
+						cout<<"acc";
+
+					}
+
+			//		l=0;
+
+				}
+
+			}
+
+			for(int j=0;j<nonter.size();j++) {
+
+				cout<<"\t";
+
+				if(k==0) {
+
+			//		l=0;
+
+					if(goto1[make_pair(i,nonter[j])]!=0)
+
+					cout<<goto1[make_pair(i,nonter[j])];
+
+				}
+
+			}
+
+//			if(l==0)
+
+			cout<<"\n";
+
+			k++;
+
+		}
+
+	}
+
+	parse();
+
+	return 0;
+
+}
+
+Give input as:
+E E+E
+E E*E
+E (E)
+E i
+
+6.Write a program to find LR(1) items for the following expression grammar and
+construct Canonical LR table assuming that the operators ‘+’ and ‘*’ are right
+associative and + has higher precedence than *
+E → E + E | E * E | (E) | id
+NOTE- I am taking ‘id’ as ‘i’
+#include <bits/stdc++.h>
+
+using namespace std;
+
+
+
+map<char,vector<string> > productions;
+
+map<char,vector<char> > first,follows;
+
+vector<vector<pair<char, pair<string, char> > > > itemsets;
+
+map<pair<int, char>, int> goto1;
+
+map<pair<int, char>, vector<string> > action;
+
+vector<char> terms;
+
+vector<pair<char, string> > closure(vector<pair<char, string> > kernel_item);
+
+void build_items();
+
+void build_actions();
+
+void find_first(string s, vector<char> &first_set,char l)
+
+{
+
+	if(s[0]=='0')
+
+	{
+
+		first_set.push_back(s[0]); 
+
+		return;
+
+	}
+
+	else if(s[0]!=l)
+
+	{
+
+		int flag=0;
+
+		for(int i=0; i<s.size(); i++)
+
+		{
+
+		
+
+			if(!(s[i]<='Z' && s[i]>='A'))
+
+			{
+
+				first_set.push_back(s[i]); 
+
+				return;
+
+			}
+
+			else
+
+			{
+
+				vector<char> tmp_first_vec;
+
+				for(int j=0; j<productions[s[i]].size(); j++)
+
+				{
+
+					if(productions[s[i]][j]!=s)
+
+					{
+
+						find_first(productions[s[i]][j],tmp_first_vec,s[i]);
+
+					}
+
+				}
+
+				flag=1;
+
+				for(int j=0;j<tmp_first_vec.size(); j++)
+
+				{
+
+					if(tmp_first_vec[j]!='0')
+
+					{
+
+						if(find(first_set.begin(),first_set.end(),tmp_first_vec[j])==first_set.end())
+
+						first_set.push_back(tmp_first_vec[j]);
+
+					}
+
+					else
+
+					flag=0; 
+
+				}
+
+			}
+
+			if(flag==1)
+
+			break;
+
+		}
+
+		if(flag==0)
+
+		first_set.push_back('0');
+
+	}
+
+}
+
+void build_first()
+
+{
+
+	map<char,vector<string> >::iterator it;
+
+	for(it=productions.begin();it!=productions.end();it++)
+
+	{
+
+		vector<char> first_set;		
+
+		for(int j=0;j<it->second.size();j++)
+
+		{
+
+			find_first(it->second[j],first_set,it->first);
+
+		}
+
+		for(int j=0;j<first_set.size();j++)
+
+		first[it->first].push_back(first_set[j]);
+
+	}
+
+}
+
+
+
+vector<pair<char, pair<string, char> > > closure(vector<pair<char, pair<string, char> > > kernel_item)
+
+{
+
+	vector<pair<char, pair<string, char> > > ret;
+
+	vector<char> s1;
+
+	vector<pair<string, char> >  s2;
+
+	for(int it=0; it<kernel_item.size(); it++)
+
+	{
+
+		s1.push_back(kernel_item[it].first);
+
+		s2.push_back(kernel_item[it].second);
+
+		ret.push_back(kernel_item[it]);
+
+	}
+
+	int i=0;
+
+	while(i<s1.size())
+
+	{
+
+		int pos=-1;
+
+		string str=s2[i].first;
+
+		for(int j=0; j<str.length(); j++)
+
+		{
+
+			if(s2[i].first[j]=='.')
+
+			{
+
+				pos=j;
+
+				break;
+
+			}
+
+		}
+
+		if(pos!=s2[i].first.length()-1 && s2[i].first[pos+1]!='0')
+
+		{
+
+			string str1="";
+
+			for(int g=pos+2; g<s2[i].first.length(); g++)
+
+			str1+=s2[i].first[g];
+
+			if(s2[i].first.length()<=pos+2 || s2[i].second!='$')
+
+			str1+=s2[i].second;
+
+			int flag=1;
+
+			vector<char> follow_set;
+
+			for(int r=0;r<str1.length();r++)
+
+			{
+
+				if(flag==1)
+
+				{
+
+					if(str1[r]<='Z' && str1[r]>='A')
+
+					{
+
+						flag=0;
+
+						for(int k=0;k<first[str1[r]].size();k++)
+
+						{
+
+							if(first[str1[r]][k]!='0' && find(follow_set.begin(),follow_set.end(),first[str1[r]][k])==follow_set.end())
+
+							{
+
+								follow_set.push_back(first[str1[r]][k]);
+
+							}
+
+							else if(first[str1[r]][k]=='0')
+
+							flag=1;
+
+						}
+
+					}
+
+					else
+
+					{
+
+						flag=0;
+
+						if(find(follow_set.begin(),follow_set.end(),str1[r])==follow_set.end())
+
+						{
+
+							follow_set.push_back(str1[r]);
+
+						}
+
+					}
+
+				}
+
+			}
+
+			char ch = s2[i].first[pos+1];
+
+			map<char,vector<string> >::iterator it1;
+
+			for(it1=productions.begin();it1!=productions.end();it1++)
+
+			{
+
+				for(int j=0;j<it1->second.size();j++)
+
+				{
+
+					for(int x=0;x<follow_set.size();x++)
+
+					{
+
+						string str=".";
+
+						str=str+it1->second[j];
+
+						pair<string, char> w;
+
+						w.first=str;
+
+						w.second=follow_set[x];
+
+						if(it1->first==ch && find(s2.begin(),s2.end(),w)==s2.end())
+
+						{
+
+							s1.push_back(it1->first);
+
+							s2.push_back(w);
+
+							ret.push_back(make_pair(it1->first, w));
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		i++;
+
+	}
+
+	return ret;
+
+}
+
+void build_items(char sa)
+
+{
+
+	pair<char, string> curr_production;
+
+	curr_production.first=sa;
+
+	curr_production.second=productions[sa][0];
+
+	curr_production.second.insert(curr_production.second.begin(), '.');
+
+	vector<pair<char, pair<string, char> > > init; 
+
+	init.push_back(make_pair(curr_production.first, make_pair(curr_production.second, '$'))); 
+
+	itemsets.push_back(closure(init)); 
+
+	vector<vector<pair<char, pair<string, char> > > > s; 
+
+	s.push_back(closure(init)); 
+
+	int z=0;
+
+	while(z<s.size())
+
+	{
+
+		vector<pair<char, pair<string, char> > > now; 
+
+		now=s[z]; 
+
+		z++;
+
+		int index = 0;
+
+		for(int i=0; i<itemsets.size(); i++)
+
+		{
+
+			if(now==itemsets[i])
+
+			{
+
+				index=i; 
+
+				break;
+
+			}
+
+		}
+
+		int u=0;
+
+		vector<char> k1;
+
+		vector< vector<pair<char, pair<string, char> > > > kernels;
+
+		for(int i=0; i<now.size(); i++)
+
+		{
+
+			string rhs = now[i].second.first;
+
+			for(int j=0; j<rhs.size(); j++)
+
+			{
+
+				if(rhs[j]=='.' && j!=rhs.size()-1)
+
+				{
+
+					swap(now[i].second.first[j], now[i].second.first[j+1]);
+
+					int p=-1;
+
+					for(int w=0;w<u;w++)
+
+					{
+
+						if(k1[w]==now[i].second.first[j])
+
+						p=w;
+
+					}
+
+					if(p!=-1)
+
+					kernels[p].push_back(now[i]);
+
+					else
+
+					{
+
+						u++;
+
+						vector<pair<char, pair<string, char> > > k2;
+
+						k2.push_back(now[i]);
+
+						kernels.push_back(k2);
+
+						k1.push_back(now[i].second.first[j]);
+
+					}
+
+				}
+
+			}
+
+		}
+
+		for(int it=0; it<u; it++)
+
+		{
+
+			vector<pair<char, pair<string, char> > > curr_close = closure(kernels[it]);
+
+			int flag = 0;
+
+			for(int i=0; i<itemsets.size(); i++)
+
+			{
+
+				if(itemsets[i]==curr_close)
+
+				{
+
+					goto1[make_pair(index, k1[it])] = i;
+
+					flag = 1; 
+
+					break;
+
+				}
+
+			}
+
+			if(flag==0)
+
+			{
+
+				goto1[make_pair(index, k1[it])] = itemsets.size();
+
+				itemsets.push_back(curr_close);
+
+				s.push_back(curr_close);
+
+			}
+
+		}
+
+	}
+
+}
+
+void build_actions(char sa)
+
+{
+
+	for(int i=0; i<itemsets.size(); i++)
+
+	{
+
+		for(int j=0; j<itemsets[i].size(); j++)
+
+		{
+
+			string tmp = itemsets[i][j].second.first;
+
+			for(int k=0; k<tmp.size(); k++)
+
+			{
+
+				if(tmp[k]=='.' && k!=tmp.size()-1)
+
+				{
+
+					if(!(tmp[k+1]>='A'&&tmp[k+1]<='Z'))
+
+					{
+
+						stringstream ss; 
+
+						ss<<goto1[make_pair(i, tmp[k+1])];
+
+						string str="shift "+ss.str();
+
+						if(find(action[make_pair(i, tmp[k+1])].begin(),action[make_pair(i, tmp[k+1])].end(),str)==action[make_pair(i, tmp[k+1])].end())
+
+						action[make_pair(i, tmp[k+1])].push_back(str);
+
+					}
+
+				}
+
+				else if(tmp[k]=='.' && k==tmp.size()-1)
+
+				{
+
+					if(itemsets[i][j].first==sa)
+
+					{
+
+						string str="accept";
+
+						if(find(action[make_pair(i, '$')].begin(),action[make_pair(i, '$')].end(),str)==action[make_pair(i, '$')].end())
+
+                        action[make_pair(i, '$')].push_back(str);
+
+						break;
+
+                    }
+
+                    pair<char, pair<string, char> > reduce_this = itemsets[i][j];
+
+                    reduce_this.second.first.erase(reduce_this.second.first.find('.'));
+
+                    stringstream ss; 
+
+					ss<<"reduce "<<reduce_this.first<<"->"<<reduce_this.second.first;
+
+					if(find(action[make_pair(i, reduce_this.second.second)].begin(),action[make_pair(i, reduce_this.second.second)].end(),ss.str())==action[make_pair(i, reduce_this.second.second)].end())
+
+    					action[make_pair(i, reduce_this.second.second)].push_back(ss.str());
+
+				}
+
+			}
+
+		} 
+
+	}
+
+}
+
+char lastop(stack<char> s,char c)
+
+{
+
+	char ch;
+
+	int l=-1,r=-1;
+
+	for(int i=s.size()-1;i>=0;i--)
+
+	{
+
+		if(s.top()=='+' || s.top()=='*')
+
+		{
+
+			ch=s.top();
+
+			if(ch=='+')
+
+			l=2;
+
+			else
+
+			l=1;
+
+			break;
+
+		}
+
+		s.pop();
+
+	}
+
+	if(c=='+')
+
+	r=2;
+
+	else
+
+	r=1;
+
+	if(l>r)
+
+	return 'r';
+
+	else
+
+	return 's';
+
+}
+
+void parse(){
+
+	string w;
+
+	cin>>w; 
+
+	w+='$';
+
+	char ch;
+
+	int i=0;
+
+	stack<int> s;
+
+	stack<char> s1;
+
+	s1.push('$');
+
+	s.push(0);
+
+	cout<<"\nParsing actions:\n";
+
+	cout<<"String is:"<<w<<"\n";
+
+	while(1)
+
+	{
+
+		string acc;
+
+		cout << "ACTION[" << s.top() << ", " <<w[i]<<"]\t";
+
+		if(action[make_pair(s.top(), w[i])].size()==1)
+
+		acc=action[make_pair(s.top(), w[i])][0];
+
+		else
+
+		{
+
+			ch=lastop(s1,w[i]);
+
+			if(action[make_pair(s.top(), w[i])][0][0]==ch)
+
+			acc=action[make_pair(s.top(), w[i])][0];
+
+			else
+
+			acc=action[make_pair(s.top(), w[i])][1];
+
+		}
+
+		if(acc[0]=='s')
+
+		{
+
+			cout<<acc<<endl;
+
+			string tmp; 
+
+			for(int j=6; j<acc.size(); j++)
+
+			tmp+=acc[j]; 
+
+			s.push(atoi(tmp.c_str()));
+
+			s1.push(w[i]); 
+
+			i++;
+
+		}
+
+		else if(acc[0]=='r')
+
+		{
+
+			cout<<acc;
+
+			char lhs=acc[7]; 
+
+			string rhs;
+
+			for(int j=10; j<acc.size(); j++)
+
+			rhs+=acc[j];
+
+			//cout<<rhs<<" ";
+
+			int popoff=rhs.size();
+
+			while(popoff--)
+
+			{
+
+				s.pop();
+
+				s1.pop();
+
+			}
+
+			s.push(goto1[make_pair(s.top(), lhs)]);
+
+			s1.push(lhs);
+
+			cout<<endl;
+
+		}
+
+		else if(acc=="accept")
+
+		{
+
+			cout<<"Accepted"<<endl;
+
+			break;
+
+		}
+
+		else
+
+		{
+
+			cout<<"Error()\n";
+
+			break;
+
+		}
+
+	}
+
+}
+
+int main()
+
+{
+
+	int n,in=0; 
+
+	vector<char> nonter;
+
+	vector<string> gra;
+
+	cout<<"Enter number of productions:"; 
+
+	cin>>n;
+
+	char s;
+
+	while(in<n)
+
+	{
+
+		char lhs; 
+
+		string rhs,s2;
+
+		cin>>lhs;
+
+		cin>>rhs;
+
+		s2+=lhs;
+
+		s2+="->";
+
+		s2+=rhs;
+
+		gra.push_back(s2);
+
+		productions[lhs].push_back(rhs);
+
+		for(int i=0; i<rhs.size(); i++)
+
+		{
+
+			if(!(rhs[i]>='A' && rhs[i]<='Z') && find(terms.begin(),terms.end(),rhs[i])==terms.end())
+
+			terms.push_back(rhs[i]);
+
+			else if(find(nonter.begin(),nonter.end(),rhs[i])==nonter.end())
+
+			nonter.push_back(rhs[i]);
+
+		}
+
+		if(in==0)
+
+		s=lhs;
+
+		in++;
+
+	}
+
+	terms.push_back('$');
+
+	build_first();
+
+	map<char,vector<char> >::iterator it;
+
+	cout<<"first:\n";
+
+	for(it=first.begin();it!=first.end();it++)
+
+	{
+
+		cout<<it->first<<"-> ";
+
+		for(int j=0;j<it->second.size();j++) 
+
+		{
+
+			cout<<it->second[j]<<" ";
+
+		}
+
+		cout<<"\n";	
+
+	}
+
+	build_items(s);
+
+	cout<<"\nItemsets:\n";
+
+	for(int i=0; i<itemsets.size(); i++)
+
+	{
+
+		cout << "I-" << i <<":\n";
+
+		for(int j=0; j<itemsets[i].size(); j++)
+
+		{
+
+			cout<<itemsets[i][j].first<<" -> "<<itemsets[i][j].second.first<<" , "<<itemsets[i][j].second.second<<endl;
+
+		}
+
+		cout<<endl;
+
+	}
+
+	cout<<"\nGo to computations:\n";
+
+	map<pair<int, char>, int>::iterator it1;
+
+	for(it1=goto1.begin(); it1!=goto1.end(); it1++)
+
+	{
+
+		cout<<"GOTO["<<(it1->first).first<<", "<<(it1->first).second<<"] = "<<it1->second<<endl;
+
+	}
+
+	build_actions(s);
+
+	cout<<"\nActions in parsing table:\n";
+
+	map<pair<int, char>, vector<string> >::iterator it2;
+
+	for(it2=action.begin(); it2!=action.end(); it2++)
+
+	{
+
+		cout<<"ACTION["<<(it2->first).first<<", "<<(it2->first).second<<"] = ";
+
+		for(int j=0; j<it2->second.size(); j++)
+
+		{
+
+			if(j!=0)
+
+			cout<<"\t";
+
+			cout<<it2->second[j];
+
+		}
+
+		cout<<endl;
+
+	}
+
+	cout<<"item";
+
+	for(int i=0;i<terms.size();i++)
+
+	cout<<"\t"<<terms[i];
+
+	for(int i=0;i<nonter.size();i++)
+
+	cout<<"\t"<<nonter[i];
+
+	cout<<"\n";
+
+	for(int i=0; i<itemsets.size(); i++)
+
+	{
+
+		cout<<i;
+
+		int k=0,l=0;
+
+		while(l==0)
+
+		{
+
+			//cout<<"\t";
+
+			l=1;
+
+			for(int j=0;j<terms.size();j++)
+
+			{
+
+				cout<<"\t";
+
+				if(action[make_pair(i,terms[j])].size()>k+1)
+
+				l=0;
+
+				if(action[make_pair(i,terms[j])].size()>k)
+
+				{
+
+					string acc=action[make_pair(i,terms[j])][k];
+
+					if(acc[0]=='s')
+
+					{
+
+						string tmp; 
+
+						for(int w=6; w<acc.size(); w++)
+
+						tmp+=acc[w];
+
+						cout<<"s"<<atoi(tmp.c_str());
+
+					}
+
+					else if(acc[0]=='r')
+
+					{
+
+						cout<<acc[0]; 
+
+						string rhs;
+
+						int w;
+
+						for(w=7; w<acc.size(); w++)
+
+						rhs+=acc[w];
+
+						for(w=0;w<gra.size();w++)
+
+						{
+
+							if(gra[w].compare(rhs)==0)
+
+							break;
+
+						}
+
+						cout<<w;
+
+					}
+
+					else if(acc=="accept")
+
+					{
+
+						cout<<"acc";
+
+					}
+
+			//		l=0;
+
+				}
+
+			}
+
+			for(int j=0;j<nonter.size();j++)
+
+			{
+
+				cout<<"\t";
+
+				if(k==0)
+
+				{
+
+			//		l=0;
+
+					if(goto1[make_pair(i,nonter[j])]!=0)
+
+					cout<<goto1[make_pair(i,nonter[j])];
+
+				}
+
+			}
+
+//			if(l==0)
+
+			cout<<"\n";
+
+			k++;
+
+		}
+
+	}
+
+	parse();
+
+	return 0;
+
+}
+
+Q7: Write a program to construct LALR parse table for a given grammar and 
+show the derivation sequence for an input string of the grammar.
+#include <stdio.h>
+
+#include <stdlib.h>
+
+#include <string.h>
+
+
+
+// @ is null symbol
+
+
+
+struct Rules
+
+{
+
+	char var;
+
+	char der[10];
+
+};
+
+
+
+struct Item
+
+{
+
+	int dotposition;
+
+	struct Rules r;
+
+	int lookahead[255];
+
+	int f;
+
+};
+
+
+
+struct State
+
+{
+
+	int len;
+
+	struct Item itm[20];
+
+	int transition[255];
+
+};
+
+
+
+struct list
+
+{
+
+	struct State data;
+
+	struct list* next;
+
+};
+
+
+
+int variables[26] = {0};
+
+int terminals[255] = {0};
+
+
+
+int nullable[26] = {0};
+
+
+
+char first[26][255] = {{0}};
+
+
+
+char follow[26][255] = {{0}};
+
+
+
+char *var,*term;
+
+
+
+char start;
+
+
+
+int n,n_var = 0,n_term = 0;
+
+struct Rules* a;
+
+
+
+struct list* head,*tail;
+
+
+
+int is_nullable(char* s)
+
+{
+
+	char* p;
+
+	p = s;
+
+	while(*p!='\0')
+
+	{
+
+		if(*p<'A'||*p>'Z'||!nullable[*p-'A'])
+
+			return 0;
+
+		p++;
+
+	}
+
+	return 1;
+
+}
+
+
+
+int is_item_in(struct State* l,struct Rules r,int dot)
+
+{
+
+	for(int i=0;i<l->len;i++)
+
+	{
+
+		if((l->itm[i].dotposition==dot)&&(l->itm[i].r.var==r.var)&&(strcmp(l->itm[i].r.der,r.der)==0))
+
+			return i;
+
+	}
+
+	return -1;
+
+}
+
+
+
+int is_item_in_advanced(struct State* l,struct Rules r,int dot,int* bit)
+
+{
+
+	int f = 0;
+
+	for(int i=0;i<l->len;i++)
+
+	{
+
+		f = 1;
+
+		for(int j=0;j<255;j++)
+
+		{
+
+			if(bit[j]!=l->itm[i].lookahead[j])
+
+			{
+
+				f = 0;break;
+
+			}
+
+		}
+
+		if(f&&(l->itm[i].dotposition==dot)&&(l->itm[i].r.var==r.var)&&(strcmp(l->itm[i].r.der,r.der)==0))
+
+			return 1;
+
+	}
+
+	return 0;
+
+}
+
+
+
+
+
+void fill_lookaheads(int* bit,struct Item* l)
+
+{
+
+	int length = strlen(l->r.der+l->dotposition+1);
+
+	char sto;int f = 0;
+
+	for(int i=l->dotposition+1;i<l->dotposition+length+1;i++)
+
+	{
+
+		if(l->r.der[i]=='\0')
+
+			continue;
+
+		if(l->r.der[i]<'A'||l->r.der[i]>'Z')
+
+		{
+
+			bit[l->r.der[i]] = 1;
+
+			return;
+
+		}
+
+		for(int j=0;j<255;j++)
+
+		{
+
+			if(first[l->r.der[i]-'A'][j])
+
+			{
+
+				bit[j] = 1;
+
+			}
+
+		}
+
+		sto = l->r.der[i];
+
+		l->r.der[i] = '\0';
+
+		if(!is_nullable(l->r.der+l->dotposition+1))
+
+		{
+
+			l->r.der[i] = sto;
+
+		}
+
+		else
+
+		{
+
+			l->r.der[i] = sto;f = 1;break;
+
+		}
+
+	}
+
+	if(!f)
+
+	{
+
+		for(int i=0;i<255;i++)
+
+		{
+
+			if(l->lookahead[i])
+
+			bit[i] = 1;
+
+		}
+
+	}
+
+} 
+
+
+
+void build_state(struct State* l)
+
+{
+
+	int s;
+
+	for(int i=0;i<l->len;i++)
+
+	{
+
+		if(l->itm[i].r.der[l->itm[i].dotposition]>='A'&&l->itm[i].r.der[l->itm[i].dotposition]<='Z')
+
+		{
+
+			//printf("yes\n");
+
+			for(int j=0;j<n;j++)
+
+			{
+
+				if((a[j].var==l->itm[i].r.der[l->itm[i].dotposition]))
+
+				{
+
+					if((s = is_item_in(l,a[j],0))==-1)
+
+					{
+
+						l->itm[l->len].dotposition = 0;
+
+						l->itm[l->len].r = a[j];
+
+						l->itm[l->len].f = 0;
+
+						memset(l->itm[l->len].lookahead,0,255);
+
+						fill_lookaheads(l->itm[l->len].lookahead,&l->itm[i]);
+
+						l->len++;
+
+					}
+
+					else
+
+					{
+
+						fill_lookaheads(l->itm[s].lookahead,&l->itm[i]);
+
+					}
+
+
+
+				}
+
+			}
+
+		}
+
+	}
+
+}
+
+
+
+void print_state(struct list* q)
+
+{
+
+	for(int i=0;i<q->data.len;i++)
+
+		{
+
+			printf("%c :: ",q->data.itm[i].r.var);
+
+			if(q->data.itm[i].r.der[0]=='@')
+
+				q->data.itm[i].r.der[0] = '\0';
+
+			char sto = q->data.itm[i].r.der[q->data.itm[i].dotposition];
+
+			q->data.itm[i].r.der[q->data.itm[i].dotposition] = '\0';
+
+			printf("%s.",q->data.itm[i].r.der);
+
+			q->data.itm[i].r.der[q->data.itm[i].dotposition] = sto;
+
+			printf("%s",q->data.itm[i].r.der+q->data.itm[i].dotposition);
+
+
+
+			printf(" { ");
+
+			for(int j=0;j<255;j++)
+
+			{
+
+				if(q->data.itm[i].lookahead[j])
+
+					printf("%c,",(char)j);
+
+			}
+
+			printf(" }\n");
+
+		}
+
+}
+
+
+
+
+
+int state_already_included(struct list* l,struct State* s)
+
+{
+
+	struct list* q;
+
+	q = l;
+
+	int f,rtn = -1;int ind = 0;
+
+	while(q!=NULL)
+
+	{
+
+		f = 0;
+
+		if(q->data.len!=s->len)
+
+		{
+
+			q = q->next;
+
+			ind++;
+
+			continue;
+
+		}
+
+		for(int i=0;i<s->len;i++)
+
+		{
+
+			if(is_item_in(&q->data,s->itm[i].r,s->itm[i].dotposition)==-1)
+
+			{
+
+				f = 1;break;
+
+			}
+
+
+
+		}
+
+		if(!f)
+
+		{
+
+			return ind;
+
+		}
+
+		ind++;q = q->next;
+
+	}
+
+	return -1;
+
+}
+
+
+
+
+
+int num=0;
+
+
+
+
+
+
+
+void add_lookaheads(struct list* l,int s,struct State* t)
+
+{
+
+	struct list* q;
+
+	q = l;
+
+	while(s--)
+
+		q = q->next;
+
+	for(int i=0;i<t->len;i++)
+
+	{
+
+		for(int j=0;j<q->data.len;j++)
+
+		{
+
+			if((t->itm[i].r.var==q->data.itm[j].r.var)&&(strcmp(t->itm[i].r.der,q->data.itm[j].r.der)==0)&&(t->itm[i].dotposition==q->data.itm[j].dotposition))
+
+			{
+
+				for(int k=0;k<255;k++)
+
+					if(t->itm[i].lookahead[k])
+
+						q->data.itm[j].lookahead[k] = 1;
+
+				break;
+
+			}
+
+		}
+
+	}
+
+}
+
+
+
+
+
+
+
+void find_out_states(struct list* l)
+
+{
+
+	if(l==NULL)
+
+		return;
+
+	for(int i=0;i<l->data.len;i++)
+
+	{
+
+		if(l->data.itm[i].f)
+
+			continue;
+
+		else if(l->data.itm[i].dotposition==strlen(l->data.itm[i].r.der))
+
+		{
+
+			l->data.itm[i].f = 1;
+
+			continue;
+
+		}
+
+		
+
+		struct list* t;
+
+		t = (struct list*)malloc(sizeof(struct list));
+
+		for(int ind=0;ind<255;ind++)
+
+		{
+
+			t->data.transition[ind] = -1;
+
+		}
+
+		t->data.len = 1;
+
+		t->data.itm[0].dotposition = l->data.itm[i].dotposition+1;
+
+		t->data.itm[0].r =  l->data.itm[i].r;
+
+		for(int ind=0;ind<255;ind++)
+
+					t->data.itm[0].lookahead[ind] = l->data.itm[i].lookahead[ind];
+
+		l->data.itm[i].f = 1;
+
+		for(int j=i+1;j<l->data.len;j++)
+
+		{
+
+			if(l->data.itm[j].r.der[l->data.itm[j].dotposition]==l->data.itm[i].r.der[l->data.itm[i].dotposition])
+
+			{
+
+				
+
+				t->data.itm[t->data.len].dotposition = l->data.itm[j].dotposition+1;
+
+				t->data.itm[t->data.len].r =  l->data.itm[j].r;
+
+				memset(t->data.itm[t->data.len].lookahead,0,255);
+
+				for(int ind=0;ind<255;ind++)
+
+					t->data.itm[t->data.len].lookahead[ind] = l->data.itm[j].lookahead[ind];
+
+				l->data.itm[j].f = 1;
+
+				t->data.len++;
+
+
+
+			}
+
+		}
+
+		build_state(&t->data);
+
+		int s;
+
+		if((s = state_already_included(head,&t->data))==-1)
+
+		{
+
+			tail->next = t;
+
+			tail = t;
+
+			tail->next = NULL;
+
+			l->data.transition[l->data.itm[i].r.der[l->data.itm[i].dotposition]] = num;
+
+			num++;
+
+			for(int ii=0;ii<t->data.len;ii++)
+
+			{
+
+				if(t->data.itm[i].r.der[0]=='@')
+
+					t->data.itm[i].r.der[0] = '\0';
+
+			}
+
+
+
+		}
+
+		else
+
+		{
+
+			l->data.transition[l->data.itm[i].r.der[l->data.itm[i].dotposition]] = s;
+
+
+
+
+
+			// the follwing function has to be implemented
+
+
+
+			print_state(t);
+
+
+
+			struct list *q = head;
+
+
+
+			add_lookaheads(head,s,&t->data);
+
+		}
+
+	}
+
+	find_out_states(l->next);
+
+}
+
+
+
+struct Table
+
+{
+
+	 char op;
+
+	 int state_no;
+
+};
+
+
+
+
+
+int find(char c)
+
+{
+
+	for(int i=0;i<n_term;i++)
+
+		if(term[i]==c)
+
+			return i;
+
+	for(int i=0;i<n_var;i++)
+
+		if(var[i]==c)
+
+			return n_term+i;
+
+}
+
+
+
+int find_rule(struct Rules r)
+
+{
+
+	for(int i=0;i<n;i++)
+
+	{
+
+		if(a[i].var==r.var&&strcmp(a[i].der,r.der)==0)
+
+			return i+1;
+
+	}
+
+	return -1;
+
+}
+
+
+
+void construct_table(struct Table** tab,int num)
+
+{
+
+	struct list* q;int k;
+
+	q = head;
+
+	for(int i=0;i<num;i++)
+
+	{
+
+		for(int j=0;j<255;j++)
+
+		{
+
+			if(q->data.transition[j]!=-1)
+
+			{
+
+				k = find(j);
+
+				if(j>='A'&&j<='Z')
+
+				{
+
+					tab[i][k].state_no = q->data.transition[j];
+
+				}
+
+				else
+
+				{
+
+					tab[i][k].op = 'S';
+
+					tab[i][k].state_no = q->data.transition[j];
+
+				}
+
+			}
+
+		}
+
+
+
+		for(int j=0;j<q->data.len;j++)
+
+		{
+
+
+
+			if(q->data.itm[j].dotposition==strlen(q->data.itm[j].r.der))
+
+			{
+
+				if(q->data.itm[j].r.var=='#')
+
+				{
+
+					k = find('$');
+
+					tab[i][k].op = 'A';
+
+					tab[i][k].state_no = 0;continue;
+
+				}
+
+				int nn = find_rule(q->data.itm[j].r);
+
+				for(int l=0;l<255;l++)
+
+				{
+
+					if(q->data.itm[j].lookahead[l])
+
+					{
+
+						k = find(l);
+
+						if(tab[i][k].state_no==-1)
+
+						{
+
+							tab[i][k].op = 'R';
+
+							tab[i][k].state_no = nn;
+
+						}
+
+						else
+
+						{
+
+								printf("A Shift-Reduce conflict has taken place in state: %d\n",i);
+
+								printf("The operators involved are: %c (for shift), %c (for reduce)\n",term[k],a[nn-1].der[1]);
+
+								printf("Press 1. for shift 2. for reduce\n");
+
+								int d;
+
+								scanf("%d",&d);while(getchar()!='\n');
+
+								if(d==2)
+
+								{
+
+									tab[i][k].op = 'R';
+
+									tab[i][k].state_no = nn;
+
+								}
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		q = q->next;
+
+	}
+
+
+
+
+
+}
+
+
+
+
+
+int main(int argc, char const *argv[])
+
+{
+
+	if(argc<2)
+
+	{
+
+		printf("Usage: %s [STARTING SYMBOL]\n",argv[0]);
+
+		exit(0);
+
+	}
+
+	printf("Enter the no of rules\n");
+
+	scanf("%d",&n);
+
+	while(getchar()!='\n');
+
+	a = (struct Rules*)malloc(sizeof(struct Rules)*n);
+
+	for(int i=0;i<n;i++)
+
+	{
+
+		printf("Enter the variable\n");
+
+		scanf("%c",&a[i].var);
+
+		if(variables[a[i].var-'A'] != 1)
+
+		{
+
+			variables[a[i].var-'A'] = 1;n_var++;
+
+		}
+
+		while(getchar()!='\n');
+
+		printf("Enter the derivation\n");
+
+		scanf("%s",a[i].der);
+
+		for(int j=0;j<strlen(a[i].der);j++)
+
+		{
+
+			if(a[i].der[j]!='@'&&(a[i].der[j]<'A'||a[i].der[j]>'Z')&&terminals[a[i].der[j]] != 1)
+
+			{
+
+				terminals[a[i].der[j]] = 1;n_term++;
+
+			}
+
+		}
+
+		while(getchar()!='\n');
+
+	}
+
+
+
+
+
+
+
+	var = (char*)malloc(sizeof(char)*n_var);int ind = 0;
+
+	for(int i=0;i<26;i++)
+
+	{
+
+		if(variables[i])
+
+		var[ind++] = 'A'+i;
+
+	}
+
+	n_term++;
+
+	term = (char*)malloc(sizeof(char)*(n_term));ind = 0;
+
+	for(int i=0;i<255;i++)
+
+	{
+
+		if(terminals[i])
+
+		term[ind++] = (char)i;
+
+	}
+
+
+
+	term[ind++] = '$';
+
+
+
+
+
+	// # is the starting dummy symbol for S'
+
+
+
+	// calculating the nullable
+
+
+
+	int no_change = 0;
+
+
+
+	do
+
+	{
+
+		no_change = 0;
+
+		for(int i=0;i<n;i++)
+
+		{
+
+			if(strlen(a[i].der)==1&&a[i].der[0]=='@')
+
+			{
+
+				if(!nullable[a[i].var-'A'])
+
+				{
+
+					no_change = 1;
+
+					nullable[a[i].var-'A'] = 1;
+
+				}
+
+			}
+
+			else if(is_nullable(a[i].der))
+
+			{
+
+				if(!nullable[a[i].var-'A'])
+
+				{
+
+					no_change = 1;
+
+					nullable[a[i].var-'A'] = 1;
+
+				}
+
+			}
+
+		}
+
+	}while(no_change);
+
+
+
+	// calculating the first
+
+
+
+
+
+	do
+
+	{
+
+		no_change = 0;
+
+		for(int i=0;i<n;i++)
+
+		{
+
+			if(a[i].der[0]!='@')
+
+			{
+
+				if(a[i].der[0]>='A'&&a[i].der[0]<='Z')
+
+				{
+
+					char sto;
+
+					for(int j=0;j<strlen(a[i].der);j++)
+
+					{
+
+						sto = a[i].der[j];
+
+						a[i].der[j] = '\0';
+
+						if(is_nullable(a[i].der))
+
+						{
+
+							a[i].der[j] = sto;
+
+							if(sto>='A'&&sto<='Z')
+
+							{
+
+								for(int k=0;k<255;k++)
+
+								{
+
+									if(first[sto-'A'][k]&&!first[a[i].var-'A'][k])
+
+									{
+
+										no_change = 1;
+
+										first[a[i].var-'A'][k] = 1;
+
+									}
+
+								}
+
+							}
+
+							else if(!first[a[i].var-'A'][sto])
+
+							{
+
+								no_change = 1;
+
+								first[a[i].var-'A'][sto] = 1;
+
+								break;
+
+							}
+
+						}
+
+						else
+
+						{
+
+							a[i].der[j] = sto;
+
+							break;
+
+						}
+
+					}
+
+				}
+
+				else if(!first[a[i].var-'A'][a[i].der[0]])
+
+				{
+
+					no_change = 1;
+
+					first[a[i].var-'A'][a[i].der[0]] = 1;
+
+					break;
+
+				}
+
+			}
+
+		}
+
+	}while(no_change);
+
+
+
+
+
+	// finding the follow
+
+	start = argv[1][0];
+
+
+
+	follow[start-'A']['$'] = 1; //sentinel
+
+	do
+
+	{
+
+		no_change = 0;
+
+
+
+		for(int i=0;i<n;i++)
+
+		{
+
+			if(a[i].der[0]!='@')
+
+			{
+
+				for(int j=strlen(a[i].der)-1;j>=0;j--)
+
+				{
+
+					// if the suffix is nullable
+
+
+
+					if(a[i].der[j]>='A'&&a[i].der[j]<='Z'&&is_nullable(a[i].der+j+1))
+
+					{
+
+						for(int k=0;k<255;k++)
+
+						{
+
+							if(follow[a[i].var-'A'][k]&&!follow[a[i].der[j]-'A'][k])
+
+							{
+
+								no_change = 1;
+
+								follow[a[i].der[j]-'A'][k] = 1;
+
+							}
+
+						}
+
+					}
+
+					if(a[i].der[j]>='A'&&a[i].der[j]<='Z')
+
+					for(int k=j+1;k<strlen(a[i].der);k++)
+
+					{
+
+						char sto = a[i].der[k];
+
+						a[i].der[k] = '\0';
+
+
+
+						if(is_nullable(a[i].der+j+1))
+
+						{
+
+							a[i].der[k] = sto;
+
+							if(sto>='A'&&sto<='Z')
+
+							{
+
+								for(int l=0;l<255;l++)
+
+								{
+
+									if(first[sto-'A'][l]&&!follow[a[i].der[j]-'A'][l])
+
+									{
+
+										no_change = 1;
+
+										follow[a[i].der[j]-'A'][l] = 1;
+
+									}
+
+								}
+
+							}
+
+							else
+
+							{
+
+								if(!follow[a[i].der[j]-'A'][sto])
+
+								{
+
+									no_change = 1;
+
+									follow[a[i].der[j]-'A'][sto] = 1;
+
+									break;
+
+								}
+
+							}
+
+						}
+
+						else
+
+						{
+
+							a[i].der[k] = sto;break;
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}while(no_change);
+
+
+
+	// all prerocessing done!! now the actual part
+
+
+
+	head = (struct list*)malloc(sizeof(struct list));
+
+	tail = head;
+
+	head->data.len = 1;
+
+	//head->data.itm = (struct Item*)malloc(sizeof(struct Item)*(n+1));
+
+
+
+	head->data.itm[0].r.var = '#';
+
+
+
+	head->data.itm[0].r.der[0] = start;
+
+	head->data.itm[0].r.der[1] = '\0';
+
+
+
+	head->data.itm[0].dotposition = 0;
+
+	head->data.itm[0].f = 0;
+
+	memset(head->data.itm[0].lookahead,0,255);
+
+	head->data.itm[0].lookahead['$'] = 1;
+
+
+
+
+
+
+
+
+
+	for(int i=0;i<255;i++)
+
+	{
+
+		head->data.transition[i] = -1;
+
+	}
+
+	build_state(&head->data);
+
+	struct list* q;
+
+	q = head;
+
+	for(int i=0;i<q->data.len;i++)
+
+		{
+
+			if(q->data.itm[i].r.der[0]=='@')
+
+				q->data.itm[i].r.der[0] = '\0';
+
+		}
+
+
+
+
+
+	head->next = NULL;
+
+
+
+	tail = head;num++;
+
+	find_out_states(head);
+
+	q = head;int num1 = 0;
+
+	while(q!=NULL)
+
+	{
+
+		printf("********  I%d *********\n",num1);
+
+		print_state(q);
+
+		q = q->next;
+
+		num1++;
+
+	}
+
+
+
+
+
+	struct Table** tab;
+
+	tab = (struct Table**)malloc(sizeof(struct Table*)*num);
+
+	for(int i=0;i<num;i++)
+
+	{
+
+		tab[i] = (struct Table*)malloc(sizeof(struct Table)*(n_var+n_term));
+
+		for(int j=0;j<n_var+n_term;j++)
+
+		{
+
+			tab[i][j].state_no = -1;
+
+		}
+
+	}
+
+	for(int i=0;i<n;i++)
+
+		if(a[i].der[0]=='@')
+
+			a[i].der[0] = '\0';
+
+	construct_table(tab,num);
+
+
+
+	printf("%8s"," ");
+
+	for(int i=0;i<n_term;i++)
+
+	{
+
+		printf("%8c",term[i]);
+
+	}
+
+	//printf("\n");
+
+	for(int i=0;i<n_var;i++)
+
+		printf("%8c",var[i]);
+
+	printf("\n");
+
+	for(int i=0;i<num;i++)
+
+	{
+
+		printf("%7d:",i);
+
+		for(int j=0;j<n_term+n_var;j++)
+
+		{
+
+			if(tab[i][j].state_no!=-1)
+
+			{
+
+				printf("%7c%d",tab[i][j].op,tab[i][j].state_no);
+
+			}
+
+			else
+
+				printf("%8s","-");
+
+		}
+
+		printf("\n");
+
+	}
+
+
+
+
+
+
+
+
+
+	char word[100];
+
+
+
+	int stack[500],top = -1;
+
+	ind = 0;
+
+
+
+
+
+
+
+
+
+	printf("Enter a word to see the derivation\n");
+
+
+
+	scanf("%s",word);
+
+
+
+	strcat(word,"$");
+
+
+
+
+
+	stack[++top] = 0;
+
+
+
+	while(1)
+
+	{
+
+		int ff = find(word[ind]);
+
+		if(tab[stack[top]][ff].state_no==-1)
+
+		{
+
+			printf("ERROR While parsing!\n");exit(0);
+
+		}
+
+		if(tab[stack[top]][ff].op=='S')
+
+		{
+
+			printf("Shifting %c and pushing %d\n",word[ind],tab[stack[top]][ff].state_no);
+
+			stack[top+1] = term[ff];
+
+			stack[top+2] = tab[stack[top]][ff].state_no;top+=2;ind++;
+
+		}
+
+		else if(tab[stack[top]][ff].op=='A')
+
+		{
+
+			printf("Accepted\n");break;
+
+		}
+
+		else
+
+		{
+
+			char sto = a[tab[stack[top]][ff].state_no-1].var;
+
+			printf("%c --> %s\n",a[tab[stack[top]][ff].state_no-1].var,a[tab[stack[top]][ff].state_no-1].der);
+
+			top = top-2*strlen(a[tab[stack[top]][ff].state_no-1].der);
+
+			stack[top+1] = sto;
+
+			stack[top+2] = tab[stack[top]][find(sto)].state_no;top+=2;
+
+		}
+
+	}
+
+}
+
+8.Write a program to design a predictive parser (Construct the parse table for the
+grammar and show the derivation sequence for an input string of the grammar).
+#include<bits/stdc++.h>
+
+using namespace std;
+
+
+
+map<char,set<char> >first;
+
+map<char,set<char> >follow;
+
+map<char,vector<string> >pd;
+
+vector<char> ter;
+
+
+
+set<char> :: iterator it4;
+
+
+
+void comp_first(char s,vector<char> ter)
+
+{
+
+	for(int i=0;i<pd[s].size();i++)
+
+	{
+
+			for(int j=0;j<pd[s][i].length();j++)
+
+			{
+
+				if(find(ter.begin(),ter.end(),pd[s][i][j])!=ter.end())
+
+				{
+
+					first[s].insert(pd[s][i][j]);
+
+					break;	
+
+				}
+
+			 	int f=0;
+
+				if(pd[s][i][j]!=s)
+
+				{
+
+				//	cout<<pd[s][i][j]<<" ";
+
+				comp_first(pd[s][i][j],ter);
+
+				for(it4=first[pd[s][i][j]].begin();it4!=first[pd[s][i][j]].end();it4++)
+
+				{
+
+				char c=*it4;
+
+				if(c=='#')
+
+				{
+
+				f=1;
+
+				}
+
+				first[s].insert(c);	
+
+				}
+
+				if(f==0)
+
+				break;
+
+				}
+
+				else
+
+				break;
+
+			}		
+
+	}	
+
+}
+
+
+
+void sfirst(string s,set<char>&fset)
+
+{
+
+	int i,f=0;
+
+	for(i=0;i<s.length();i++)
+
+	{
+
+		if(find(ter.begin(),ter.end(),s[i])!=ter.end())
+
+		{
+
+			fset.insert(s[i]);
+
+			break;
+
+		}
+
+		f=0;
+
+		for(it4=first[s[i]].begin();it4!=first[s[i]].end();it4++)
+
+		{
+
+			if(*it4=='#')
+
+			{
+
+				f=1;
+
+			}
+
+			else
+
+			fset.insert(*it4);
+
+		}
+
+		if(f==0)
+
+		break;	
+
+		
+
+	}
+
+	if(i==s.length())
+
+	fset.insert('#');
+
+}
+
+
+
+void compute_follow(char c,vector<char> ter)
+
+{
+
+	map<char,vector<string> > :: iterator it2;
+
+		for(it2=pd.begin();it2!=pd.end();it2++)
+
+		{
+
+				for(int i=0;i<it2->second.size();i++)
+
+				{
+
+					for(int j=0;j<it2->second[i].size();j++)
+
+					{
+
+						if(it2->second[i][j]==c)
+
+						{
+
+							if(j+1<it2->second[i].size()
+
+									&&find(ter.begin(),ter.end(),it2->second[i][j+1])!=ter.end())
+
+							{
+
+								follow[c].insert(it2->second[i][j+1]);
+
+								break;
+
+							}
+
+							else if(j+1==it2->second[i].size() && c!=it2->first)
+
+							{
+
+								if(follow[it2->first].size()==0)
+
+								compute_follow(it2->first,ter);
+
+								for(it4=follow[it2->first].begin();it4!=follow[it2->first].end();it4++)
+
+								{
+
+								//	cout<<"last letter ";
+
+									follow[c].insert(*it4);
+
+								}
+
+							}
+
+							else
+
+							{
+
+								int f;
+
+								f=0;
+
+							//	cout<<"finding first of B and adding to follow";
+
+								string s=it2->second[i].substr(j+1);
+
+								set<char> fset;
+
+								sfirst(s,fset);
+
+								for(it4=fset.begin();it4!=fset.end();it4++)
+
+								{
+
+									if(*it4=='#')
+
+									f=1;
+
+									else
+
+									follow[c].insert(*it4);
+
+								}
+
+								if(f==1)
+
+								{
+
+									if(follow[it2->first].size()==0)
+
+									compute_follow(it2->first,ter);
+
+									it4=follow[it2->first].begin();
+
+									for(;it4!=follow[it2->first].end();it4++)
+
+									{
+
+									follow[c].insert(*it4);
+
+									}
+
+								}
+
+							}
+
+							break;
+
+						}
+
+					}
+
+				}
+
+		}
+
+}
+
+
+
+void print(stack <char> s)
+
+{
+
+    while (!s.empty())
+
+    {
+
+        cout<<s.top();
+
+        s.pop();
+
+    }
+
+    cout << '\t';
+
+}
+
+
+
+
+
+int main()
+
+{
+
+	int t;
+
+	cout<<"enter no of terminals :";
+
+	cin>>t;
+
+	cout<<"enter terminals :";
+
+	for(int i=0;i<t;i++)
+
+	{
+
+		char a;
+
+		cin>>a;
+
+		ter.push_back(a);
+
+	}
+
+	ter.push_back('#');
+
+	int npd;
+
+	cout<<"enter no of productions :";
+
+	cin>>npd;
+
+	cout<<"enter productions \n";
+
+	char lp;
+
+	string rp;
+
+	vector<char> nt;
+
+	for(int i=0;i<npd;i++)
+
+	{
+
+		cin>>lp>>rp;
+
+		pd[lp].push_back(rp);
+
+		nt.push_back(lp);
+
+		for(int j=0;j<rp.length();j++)
+
+		{
+
+			if(find(ter.begin(),ter.end(),rp[j])==ter.end())
+
+			nt.push_back(rp[j]);
+
+		}
+
+	}
+
+	char startsym;
+
+	cout<<"enter the start symbol :";
+
+	cin>>startsym;
+
+	
+
+	map<char,vector<string> > :: iterator it;
+
+	for(it=pd.begin();it!=pd.end();it++)
+
+	{
+
+		if(first[it->first].size()==0)
+
+		comp_first(it->first,ter);
+
+	}
+
+	
+
+	map<char,set<char> > :: iterator it1;
+
+	for(it1=first.begin();it1!=first.end();it1++)
+
+	{
+
+		cout<<"first of "<<it1->first<<" { ";
+
+		for(it4=first[it1->first].begin();it4!=first[it1->first].end();it4++)
+
+		{
+
+			cout<<*it4<<",";
+
+		}
+
+		cout<<" } \n";
+
+	}
+
+	
+
+	follow[startsym].insert('$');
+
+	for(it=pd.begin();it!=pd.end();it++)
+
+	{
+
+		compute_follow(it->first,ter);
+
+	}
+
+
+
+	for(it1=follow.begin();it1!=follow.end();it1++)
+
+	{
+
+		cout<<"follow of "<<it1->first<<" { ";
+
+		for(it4=follow[it1->first].begin();it4!=follow[it1->first].end();it4++)
+
+		{
+
+			cout<<*it4<<",";
+
+		}
+
+		cout<<" } \n";
+
+	}
+
+	
+
+	map<pair<char,char>,string> pptable;
+
+	set<char> fset;
+
+	pair<char,char> p;
+
+	int f=0;
+
+	for(it=pd.begin();it!=pd.end();it++)
+
+	{
+
+		for(int i=0;i<it->second.size();i++)
+
+		{
+
+			f=0;
+
+			string s=it->second[i];
+
+			fset.clear();
+
+			sfirst(s,fset);
+
+			string str="";
+
+			str+=it->first;
+
+			str+=" -> ";
+
+			str+=s;
+
+			for(it4=fset.begin();it4!=fset.end();it4++)
+
+			{
+
+				if(*it4=='#')
+
+				f=1;
+
+				else
+
+				{
+
+				p.first=it->first;
+
+				p.second=*it4;
+
+				pptable[p]=str;
+
+				}
+
+			}
+
+			if(f==1)
+
+			{
+
+				for(it4=follow[it->first].begin();it4!=follow[it->first].end();it4++)
+
+				{
+
+					p.first=it->first;
+
+					p.second=*it4;
+
+					pptable[p]=str;
+
+				}
+
+			}
+
+		}
+
+	}
+
+	
+
+	map<pair<char,char>,string> :: iterator it5;
+
+	
+
+/*	cout<<"nonter- \n minal\t \t Input Symbol\n";
+
+	cout<<"\t \t \t";
+
+	for(int i=0;i<ter.size();i++)
+
+	{
+
+		if(ter[i]=='#')
+
+		cout<<'$'<<"\t";
+
+		else
+
+		cout<<ter[i]<<"\t\t";
+
+	}*/
+
+	for(it5=pptable.begin();it5!=pptable.end();it5++)
+
+	{
+
+	     cout<<it5->first.first<<" on input "<<it5->first.second<<" ::  "<<it5->second<<endl;	
+
+	}
+
+	
+
+	string input;
+
+	cout<<"enter input string :";
+
+	cin>>input;
+
+	stack<char> st;
+
+	st.push('$');
+
+	st.push(startsym);
+
+	int i;
+
+	for(i=0;i<input.length();)
+
+	{
+
+		p.first=st.top();
+
+		p.second=input[i];
+
+		if(p.first==p.second)
+
+		{
+
+			st.pop();
+
+			i++;
+
+		}
+
+		else 
+
+		{
+
+			st.pop();
+
+			if(pptable[p].length()==0)
+
+			break;
+
+			cout<<pptable[p]<<endl;
+
+			for(int j=pptable[p].length()-1;j>=5;j--)
+
+			{
+
+				if(pptable[p][j]!='#')
+
+				st.push(pptable[p][j]);
+
+			}
+
+		}
+
+		print(st);
+
+		cout<<input.substr(i)<<endl;
+
+	}
+
+	if(i==input.length())
+
+	cout<<"accepted\n";
+
+	else
+
+	cout<<"not accepted\n";
+
+	return 0;
+	
+}
+
+9. Write a program to implement operator precedence parsing (Precedence
+table is given and do parsing from precedence table).
+#include<bits/stdc++.h>
+
+using namespace std;
+
+
+
+vector<string> productions{")E(","E*E","E+E","i","E^E"};
+
+vector<vector<char>> prec {
+
+
+
+              //              /input/
+
+
+
+            /*symbol_stack    +    -   *   /   ^   i   (   )   $  */
+
+
+
+            /*  + */  {'>', '>','<','<','<','<','<','>','>'},
+
+
+
+            /*  - */  {'>', '>','<','<','<','<','<','>','>'},
+
+
+
+            /*  * */  {'>', '>','>','>','<','<','<','>','>'},
+
+
+
+            /*  / */  {'>', '>','>','>','<','<','<','>','>'},
+
+
+
+            /*  ^ */  {'>', '>','>','>','<','<','<','>','>'},
+
+
+
+            /*  i */  {'>', '>','>','>','>','e','e','>','>'},
+
+
+
+            /*  ( */  {'<', '<','<','<','<','<','<','>','e'},
+
+
+
+            /*  ) */  {'>', '>','>','>','>','e','e','>','>'},
+
+
+
+            /*  $ */  {'<', '<','<','<','<','<','<','<','>'}
+
+
+
+ };
+
+
+
+int getindex(char c) {
+
+	switch(c) {
+
+		case '+':return 0;
+
+		case '-':return 1;
+
+		case '*':return 2;
+
+		case '/':return 3;
+
+		case '^':return 4;
+
+		case 'i':return 5;
+
+		case '(':return 6;
+
+	        case ')':return 7;
+
+		case '$':return 8;
+
+    	}
+
+	return -1;
+
+}
+
+
+
+string symbol_stack="";
+
+string lasthandle="";
+
+int reduce() {
+
+	int i,len,found,t;
+
+	for(i=0;i<productions.size();i++) { //selecting productions 
+
+		len=productions[i].size();
+
+	    	if(symbol_stack.back()==productions[i][0]) {
+
+	        	found=1;
+
+	        	for(t=0;t<len;t++) {
+
+	            		if(*(symbol_stack.end()-1-t)!=productions[i][t]) {
+
+	                	found=0;
+
+	                	break;
+
+	            	}
+
+	        }
+
+	        if(found==1) {
+
+	        	symbol_stack.resize(symbol_stack.size()-t);
+
+	            	symbol_stack+='E';
+
+	            	lasthandle=productions[i];
+
+	            	return 1;//successful reduction
+
+	            }
+
+	       }
+
+	}
+
+	return 0;
+
+}
+
+
+
+bool Operator_Precedence(string input) {
+
+	int l=input.size();
+
+	int ip=0;
+
+	while(ip<l) {
+
+		if(input[ip]=='$' && symbol_stack=="$E") return 1;
+
+		else {
+
+			char a=symbol_stack.back(),b=input[ip];
+
+			if(symbol_stack.back()=='E' ||prec[getindex(a)][getindex(b)]=='<' ||prec[getindex(a)][getindex(b)]=='e') {
+
+				symbol_stack.push_back(b);
+
+				ip++;
+
+				cout<<"\n";
+
+				cout<<symbol_stack;
+
+				cout<<"\t";
+
+				cout<<input.substr(ip);
+
+				cout<<"\t\tShift";
+
+			}
+
+			else if(prec[getindex(a)][getindex(b)]=='>') {
+
+				while(reduce()) {
+
+					cout<<"\n";
+
+					cout<<symbol_stack;
+
+					cout<<"\t";
+
+					cout<<input.substr(ip);
+
+					reverse(lasthandle.begin(), lasthandle.end());
+
+			       		cout<<"\t\tReduced: E->"<<lasthandle;
+
+				}
+
+			}
+
+		}
+
+	}
+
+	return 0;
+
+}
+
+
+
+int main() {
+
+	string input;
+
+	cout<<"Enter input: ";
+
+	cin>>input;
+
+	input+='$';
+
+	
+
+	symbol_stack.push_back('$');
+
+	printf("\nSTACK\tINPUT\tACTION");
+
+	if(Operator_Precedence(input)) cout<<"\nAccepted\n";
+
+	else cout <<"\nNot Accepted\n";
+
+	return 0;
+
+}
+
+10.Write a program to generate intermediate code using Back- patching technique.
+
+q10.l
+%option noyywrap
+
+%x DECLARATION
+
+%{
+
+	#include "y.tab.h"
+
+	int type;
+
+	struct symbol
+
+	{
+
+		int type;
+
+		char* name;
+
+		float val;
+
+	};
+
+
+
+	#define NHASH 9997
+
+
+
+
+
+	extern struct symbol Symbol_table[NHASH];
+
+
+
+	struct ID_List
+
+	{
+
+		int type;
+
+		struct symbol* s;
+
+		struct ID_List* next;
+
+	};
+
+
+
+	int Hash(char* s);
+
+	extern struct symbol* search(char* s);
+
+	extern struct symbol* insert(char* s);
+
+%}
+
+
+
+ws [ \t\n]
+
+digit [0-9]
+
+letter [a-zA-Z]
+
+
+
+%%
+
+
+
+"main()" {return MAIN;}
+
+
+
+"if" {return IF;}
+
+"else" {return ELSE;}
+
+"while" {return WHILE;}
+
+
+
+"+" |
+
+"-" |
+
+"*" |
+
+"/" |
+
+"?" |
+
+":" |
+
+"%" |
+
+"(" |
+
+")" |
+
+";" |
+
+"{" |
+
+"}" |
+
+"," |
+
+"@" {return yytext[0];}
+
+
+
+"int" {BEGIN DECLARATION;type = 1;return INT;}
+
+"float" {BEGIN DECLARATION;type = 2;return FLOAT;}
+
+
+
+"==" {yylval.cmp = 1;return CMP;}
+
+">" {yylval.cmp = 2;return CMP;}
+
+"<" {yylval.cmp = 3;return CMP;}
+
+">=" {yylval.cmp = 4;return CMP;}
+
+"<=" {yylval.cmp = 5;return CMP;}
+
+"!=" {yylval.cmp = 6;return CMP;}
+
+
+
+"=" {yylval.assgn = 1;return ASSGN;}
+
+"+=" {yylval.assgn = 2;return ASSGN;}
+
+"-=" {yylval.assgn = 3;return ASSGN;}
+
+"*=" {yylval.assgn = 4;return ASSGN;}
+
+"/=" {yylval.assgn = 5;return ASSGN;}
+
+
+
+"|" {yylval.bit = 1;return BIT;}
+
+"&" {yylval.bit = 2;return BIT;}
+
+"~" {yylval.bit = 3;return BIT;}
+
+
+
+"&&" {yylval.log = 1;return LOG;}
+
+"||" {yylval.log = 2;return LOG;}
+
+"!" {yylval.log = 3;return LOG;}
+
+
+
+{digit}+ {yylval.d = atoi(yytext);return INTEGER;}
+
+{digit}*[\.]{digit}+ {yylval.f = atof(yytext);return REAL;}
+
+
+
+<DECLARATION>{letter}+ {yylval.s = insert(yytext);if(yylval.s!=NULL){printf("Name = %s\n",yylval.s->name);yylval.s->type = type;return ID;}else return ERR;}
+
+<DECLARATION>"," {return ',';}
+
+<DECLARATION>";" {BEGIN INITIAL;return ';';}
+
+{letter}+ {yylval.s = search(yytext);if(yylval.s!=NULL)return ID;else return ERR;}
+
+{ws}+ {}
+
+q10.y
+%{
+
+	#include <bits/stdc++.h>
+
+	#include <string>
+
+	#include <fstream>
+
+	using namespace std;
+
+	extern FILE* yyin;
+
+	int yyerror(string s);
+
+	int temp_counter = 1,line_no = 0;
+
+	extern int yylex();
+
+	struct lnode
+
+	{
+
+		int lineno;
+
+		struct lnode* next;
+
+	};
+
+	
+
+	struct Expression
+
+	{
+
+		string temp_name;
+
+		struct lnode *truelist,*falselist,*nextlist;
+
+		int type;
+
+	};
+
+	
+
+	struct sentinel
+
+	{
+
+		int q;
+
+	};
+
+	
+
+	string new_temp();
+
+	
+
+	ofstream fout;
+
+	
+
+	void backpatch(struct lnode* l,int off);
+
+	
+
+	struct lnode* makelist();
+
+	
+
+	struct lnode* merge(struct lnode* l1,struct lnode* l2);
+
+	
+
+	
+
+	struct symbol Symbol_table[NHASH];
+
+	struct symbol
+
+	{
+
+		int type;
+
+		char* name;
+
+		float val;
+
+	};
+
+
+
+	#define NHASH 9997
+
+
+
+
+
+	extern struct symbol Symbol_table[NHASH];
+
+
+
+	struct ID_List
+
+	{
+
+		int type;
+
+		struct symbol* s;
+
+		struct ID_List* next;
+
+	};
+
+
+
+	int Hash(char* s);
+
+	extern struct symbol* search(char* s);
+
+	extern struct symbol* insert(char* s);
+
+	%}
+
+
+
+%union
+
+{
+
+	struct symbol* s;
+
+	int d;
+
+	float f;
+
+	struct Expression* e;
+
+	int cmp,log,bit,assgn;
+
+	struct sentinel *M;
+
+}
+
+
+
+
+
+%left ';'
+
+%left <assgn> ASSGN
+
+%left <cmp> CMP 
+
+%left <log> LOG 
+
+%left <bit> BIT
+
+%left '+' '-'
+
+%left '*' '/'
+
+%right '@'
+
+%left '%'
+
+
+
+%token IF ELSE WHILE FOR
+
+%token <s> ID 
+
+%token <d> INTEGER
+
+%token <f> REAL
+
+%token INT FLOAT MAIN ERR
+
+%nonassoc '(' ')' '{' '}'
+
+%type <e> exp stmt idlist next_sent
+
+%type <M> sent
+
+%start calclist
+
+
+
+
+
+%%
+
+
+
+exp: {$$ = NULL;}
+
+   |exp '+' exp {
+
+   	$$ = new Expression;
+
+   	$$->temp_name = new_temp();
+
+   	fout<<line_no<<" : "<<$$->temp_name<<" = "<<$1->temp_name<<"+"<<$3->temp_name<<endl;
+
+   	line_no++;
+
+   	$$->truelist = $$->falselist = NULL;
+
+   }
+
+   |exp '-' exp {
+
+   	$$ = new Expression;
+
+   	$$->temp_name = new_temp();
+
+   	fout<<line_no<<" : "<<$$->temp_name<<" = "<<$1->temp_name<<"-"<<$3->temp_name<<endl;
+
+   	line_no++;
+
+   	$$->truelist = $$->falselist = NULL;
+
+   }
+
+   |exp '/' exp {
+
+   	$$ = new Expression;
+
+   	$$->temp_name = new_temp();
+
+   	fout<<line_no<<" : "<<$$->temp_name<<" = "<<$1->temp_name<<"/"<<$3->temp_name<<endl;
+
+   	line_no++;
+
+   	$$->truelist = $$->falselist = NULL;
+
+   }
+
+   |exp '*' exp {
+
+   	$$ = new Expression;
+
+   	$$->temp_name = new_temp();
+
+   	fout<<line_no<<" : "<<$$->temp_name<<" = "<<$1->temp_name<<"*"<<$3->temp_name<<endl;
+
+   	line_no++;
+
+   	$$->truelist = $$->falselist = NULL;
+
+   }
+
+   |exp '@' exp {
+
+   	$$ = new Expression;
+
+   	$$->temp_name = new_temp();
+
+   	fout<<line_no<<" : "<<$$->temp_name<<" = "<<$1->temp_name<<"@"<<$3->temp_name<<endl;
+
+   	line_no++;
+
+   	$$->truelist = $$->falselist = NULL;
+
+   }
+
+   |exp '%' exp {
+
+   	$$ = new Expression;
+
+   	$$->temp_name = new_temp();
+
+   	fout<<line_no<<" : "<<$$->temp_name<<" = "<<$1->temp_name<<"%"<<$3->temp_name<<endl;
+
+   	line_no++;
+
+   	$$->truelist = $$->falselist = NULL;
+
+   }
+
+   |INT idlist {$2->type = 1;$$ = $2;}
+
+   |FLOAT idlist {$2->type = 2;$$ = $2;}
+
+   /*|INT ID ASSGN INTEGER {$2->type = 1;$$ = new Expression;$$->temp_name=$2->name;$$->type = $2->type;
+
+   cout<<line_no<<" : "<<$2->name<<" = "<<$4<<endl;line_no++;
+
+   }
+
+   |FLOAT ID ASSGN REAL {$2->type = 2;$$ = new Expression;$$->temp_name=$2->name;$$->type = $2->type;
+
+   cout<<line_no<<" : "<<$2->name<<" = "<<$4<<endl;line_no++;
+
+   }*/
+
+   |ID {$$ = new Expression;$$->temp_name=$1->name;$$->type = $1->type;}
+
+   |ID ASSGN exp {$$ = new Expression;string t;
+
+   switch($2)
+
+   {
+
+	
+
+   	case 1:
+
+   	fout<<line_no<<" : "<<$1->name<<" = "<<$3->temp_name<<endl;
+
+   	break;
+
+   	case 2:
+
+   	fout<<line_no<<" : "<<(t = new_temp())<<" = "<<$1->name<<"+"<<$3->temp_name<<endl;
+
+   	break;
+
+   	case 3:
+
+   	fout<<line_no<<" : "<<(t = new_temp())<<" = "<<$1->name<<"-"<<$3->temp_name<<endl;
+
+   	break;
+
+   	case 4:
+
+   	fout<<line_no<<" : "<<(t = new_temp())<<" = "<<$1->name<<"*"<<$3->temp_name<<endl;
+
+   	break;
+
+   	case 5:
+
+   	fout<<line_no<<" : "<<(t = new_temp())<<" = "<<$1->name<<"/"<<$3->temp_name<<endl;
+
+   	break;
+
+   	
+
+   }line_no++;if($2!=1){ fout<<line_no<<" : "<<$1->name<<" = "<<t<<endl;line_no++;}
+
+   }
+
+   |exp CMP exp {
+
+   	string ch;
+
+   	switch($2)
+
+   	{
+
+   		case 1:
+
+   		ch = "==";
+
+   		break;
+
+   		case 2:
+
+   		ch = ">";
+
+   		break;
+
+   		case 3:
+
+   		ch = "<";
+
+   		break;
+
+   		case 4:
+
+   		ch = ">=";
+
+   		break;
+
+   		case 5:
+
+   		ch = "<=";
+
+   		break;
+
+   		case 6:
+
+   		ch = "!=";
+
+   		break;
+
+   		
+
+   	}
+
+   	$$ = new Expression();
+
+   	fout<<line_no<<" : "<<"if ("<<$1->temp_name<<ch<<$3->temp_name<<") goto";
+
+   	$$->truelist = makelist();line_no++;
+
+   	fout<<"    \n";
+
+   	fout<<line_no<<" : "<<"goto";
+
+   	$$->falselist = makelist();fout<<"   \n";
+
+   	line_no++;
+
+   }
+
+   |exp BIT exp {
+
+   	string ch;
+
+   	switch($2)
+
+   	{
+
+   		case 1:
+
+   		ch = "|";
+
+   		break;
+
+   		case 2:
+
+   		ch = "&";
+
+   		break;
+
+   		case 3:
+
+   		ch = "~";
+
+   		break;
+
+   		
+
+   	}
+
+   	$$ = new Expression;
+
+   	$$->temp_name = new_temp();
+
+   	fout<<line_no<<" : ";
+
+   	if($1!=NULL)
+
+   	fout<<$1->temp_name;
+
+   	fout<<ch<<$3->temp_name<<endl;line_no++;
+
+   }
+
+   |exp LOG sent exp {
+
+   	string ch;
+
+   	$$ = new Expression;
+
+   	switch($2)
+
+   	{
+
+   		case 1:
+
+   		backpatch($1->truelist,$3->q);
+
+   		$$->truelist = $4->truelist;
+
+   		$$->falselist = merge($1->falselist,$4->falselist);
+
+   		break;
+
+   		case 2:
+
+   		backpatch($1->falselist,$3->q);
+
+   		$$->falselist = $4->falselist;
+
+   		$$->truelist = merge($1->truelist,$4->truelist);
+
+   		break;
+
+   		case 3:
+
+   		$$->truelist = $4->falselist;
+
+   		$$->falselist = $4->truelist;
+
+   		break;
+
+   	}
+
+   }
+
+   |INTEGER {$$ = new Expression;$$->temp_name = to_string($1);
+
+   $$->type = 1;cout<<"Number is ==***************"<<$1<<endl;}
+
+   |REAL {$$ = new Expression;$$->temp_name = to_string($1);
+
+   $$->type = 1;}
+
+   |'(' exp ')' {$$ = $2;}
+
+   ;
+
+   
+
+stmt: stmt ';' sent stmt {$$ = new Expression;if($4==NULL)
+
+    {$$->nextlist = $1->nextlist;backpatch($$->nextlist,$3->q);}else {backpatch($1->nextlist,$3->q);
+
+    $$->nextlist = $4->nextlist;
+
+    }
+
+    }
+
+   /* |stmt sent stmt {$$ = new Expression;if($3==NULL)
+
+    {$$->nextlist = $1->nextlist;backpatch($$->nextlist,$2->q);}else {backpatch($1->nextlist,$2->q);
+
+    $$->nextlist = $3->nextlist;
+
+    }}*/
+
+    | IF '(' exp ')' sent '{' stmt '}' ELSE next_sent sent '{' stmt '}' {
+
+    	$$ = new Expression;
+
+    	backpatch($3->truelist,$5->q);
+
+    	backpatch($3->falselist,$11->q);
+
+    	$$->nextlist = merge($7->nextlist,$10->nextlist);
+
+    	$$->nextlist = merge($$->nextlist,$13->nextlist);
+
+    }
+
+    | IF '(' exp ')' sent '{' stmt '}'
+
+    {
+
+    	$$ = new Expression;
+
+    	backpatch($3->truelist,$5->q);
+
+    	$$->nextlist = merge($3->falselist,$7->nextlist);
+
+    }
+
+    | WHILE sent '(' exp ')' sent '{' stmt '}'
+
+    {
+
+    	$$ = new Expression;
+
+    	backpatch($4->truelist,$6->q);
+
+    	backpatch($8->nextlist,$2->q);
+
+    	$$->nextlist = $4->falselist;
+
+    	fout<<line_no<<" : "<<"goto "<<$2->q<<endl;line_no++;
+
+    }
+
+    |exp {$$ = $1;if($1!=NULL)$$->nextlist = NULL;}
+
+    ;
+
+idlist: ID {cout<<"Here"<<endl;if($1!=NULL){cout<<"yes\n";}cout<<"Name = "<<$1->name<<endl;$$ = new Expression;cout<<"Upto\n";fout<<line_no<<" : "<<$1->name<<" = 0\n";line_no++;}
+
+      | ID','idlist {$$ = new Expression;fout<<line_no<<" : "<<$1->name<<" = 0\n";line_no++;}
+
+      ;
+
+sent:  {$$ = new sentinel;
+
+	$$->q = line_no;
+
+	}
+
+    ;
+
+next_sent: { $$ = new Expression;
+
+		fout<<line_no<<" : "<<"goto";
+
+		$$->nextlist = makelist();fout<<"    \n";line_no++;}
+
+calclist:  
+
+	| MAIN '{' stmt '}' {cout<<"Parsing Complete!!!!"<<endl;};
+
+	;
+
+
+
+%%
+
+
+
+
+
+int Hash(char* s)
+
+{
+
+	int n = strlen(s);
+
+	int h = 0;
+
+	for(int i=0;i<n;i++)
+
+	{
+
+		h = (h+(int)s[i]*(i+1))%NHASH;
+
+	}
+
+	return h;
+
+}
+
+
+
+struct symbol* insert(char* s)
+
+{
+
+	int h = Hash(s);
+
+	int t = NHASH;
+
+	struct symbol *q;
+
+	while(t>0)
+
+	{
+
+		if(Symbol_table[h].name==NULL)
+
+		{
+
+			printf("Found at: %d",h);
+
+			Symbol_table[h].name = (char*)malloc(sizeof(char)*20);
+
+			strcpy(Symbol_table[h].name,s);
+
+			q = &Symbol_table[h];
+
+			return q;
+
+		}
+
+		h = (h+1)%NHASH;
+
+		t--;
+
+	}
+
+	return NULL;
+
+}
+
+
+
+struct symbol* search(char* s)
+
+{
+
+	int h = Hash(s);
+
+	int t = NHASH;
+
+	struct symbol *q;
+
+	while(t>0)
+
+	{
+
+		if(Symbol_table[h].name==NULL)
+
+		{
+
+			return NULL;
+
+		}
+
+		else if(strcmp(Symbol_table[h].name,s)==0)
+
+		{
+
+			printf("Found at: %d",h);
+
+			q = &Symbol_table[h];
+
+			return q;
+
+		}
+
+		h = (h+1)%NHASH;
+
+		t--;
+
+	}
+
+}
+
+
+
+
+
+string new_temp()
+
+{
+
+	string s = "t";
+
+	s+=to_string(temp_counter);
+
+	temp_counter++;
+
+	return s;
+
+}
+
+
+
+struct lnode* makelist()
+
+{
+
+	int off = fout.tellp();
+
+	struct lnode* t;
+
+	t = new lnode;
+
+	t->next = NULL;
+
+	t->lineno = off;
+
+	return t;
+
+}
+
+
+
+struct lnode* merge(struct lnode* l1,struct lnode* l2)
+
+{
+
+	struct lnode *head = NULL,*tail = NULL,*q;
+
+	q = l1;
+
+	while(q!=NULL)
+
+	{
+
+		if(head==NULL)
+
+		{
+
+			head = new lnode;
+
+			head->next = NULL;
+
+			head->lineno = q->lineno;
+
+			tail = head;
+
+		}
+
+		else
+
+		{
+
+			tail->next = new lnode;
+
+			tail->next->next = NULL;
+
+			tail->next->lineno = q->lineno;
+
+			tail = tail->next;
+
+		}
+
+		q = q->next;
+
+	}
+
+	q = l2;
+
+	while(q!=NULL)
+
+	{
+
+		if(head==NULL)
+
+		{
+
+			head = new lnode;
+
+			head->next = NULL;
+
+			head->lineno = q->lineno;
+
+			tail = head;
+
+		}
+
+		else
+
+		{
+
+			tail->next = new lnode;
+
+			tail->next->next = NULL;
+
+			tail->next->lineno = q->lineno;
+
+			tail = tail->next;
+
+		}
+
+		q = q->next;
+
+	}
+
+	return head;
+
+}
+
+
+
+void backpatch(struct lnode* l,int off)
+
+{
+
+	struct lnode* q;
+
+	q = l;
+
+	int sto = fout.tellp();
+
+	while(q!=NULL)
+
+	{
+
+		fout.seekp(q->lineno+1,ios::beg);
+
+		fout<<off;
+
+		q = q->next;
+
+	}
+
+	fout.seekp(0,ios::end);
+
+	cout<<"Returning"<<endl;
+
+}
+
+
+
+
+
+
+
+
+
+int main(int argc,char* argv[])
+
+{
+
+	for(int i=0;i<NHASH;i++)
+
+	{
+
+		Symbol_table[i].name = NULL;	
+
+	}
+
+	yyin = fopen(argv[1],"r");
+
+	if(yyin==NULL)
+
+	{
+
+		perror("Could not open");
+
+		exit(0);
+
+	}
+
+	fout.open("output.txt",ios::out);
+
+	yydebug = 1;
+
+	yyparse();
+
+	return 0;
+
+}
+
+
+
+int yyerror(string s)
+
+{
+
+	cout<<s;
+
+	return 0;
+
+}
+
+/* an initial implementation of desk calculator */
+
+%{
+	#include <stdio.h>
+	#include <stdlib.h>	
+	#include <math.h>
+	#include <string.h>
+	#include <stdarg.h>
+	#include "DeskCalc.h"
+	int yylex();
+%}
+%union{
+	struct ast* a;
+	double d;
+	struct symbol *s;
+	struct symlist *s1;
+	int fn;
+}
+
+
+%token <d> NUM 
+%token <s> NAME
+%token <fn> FUNC
+%token IF THEN ELSE WHILE DO LET
+%nonassoc <fn> CMP
+%right EQU
+%left ADD SUB
+%left MUL DIV
+%right EXP
+%nonassoc ABS UM
+%token EOL
+%token OPBR
+%token CLBR
+%token DISPLAY
+%type <a> exp stmt list explist
+%type <s1> symlist
+
+%start calclist
+
+
+
+%%
+exp: exp CMP exp { $$  = newcmp($2,$1,$3);}
+   | exp ADD exp { $$ = newast(ADD,(struct ast*)$1,(struct ast*)$3);}
+   | exp SUB exp { $$ = newast(SUB,(struct ast*)$1,(struct ast*)$3);}
+   | exp MUL exp { $$ = newast(MUL,(struct ast*)$1,(struct ast*)$3);}
+   | exp DIV exp { $$ = newast(DIV,(struct ast*)$1,(struct ast*)$3);}
+   | exp EXP exp {$$ = newast(EXP,(struct ast*)$1,(struct ast*)$3);}
+   | ABS exp { $$ = newast(ABS,(struct ast*)$2,NULL);}
+   | UM exp { $$ = newast(UM,(struct ast*)$2,NULL);}
+   | OPBR exp CLBR { $$ = $2;}
+   | NAME { 
+		$$ = newref($1); 
+	  }
+   | NUM { $$ = newnum(NUM,$1);}
+   | NAME EQU exp {$$ = newasgn($1,$3);}
+   | FUNC OPBR explist CLBR {$$ = newfunc($1,$3);}
+   | NAME OPBR explist CLBR {$$ = newcall($1,$3);}
+   ;
+   
+explist: exp
+       | exp ',' explist { $$ = newast('L',$1,$3); };
+       ;
+symlist: NAME 	{$$ = newsymlist($1,NULL); }
+       | NAME ',' symlist { $$ = newsymlist($1,$3); }
+       ;
+   
+   
+stmt: IF exp THEN list { $$ = newflow('I',$2,$4,NULL);};
+    | IF exp THEN list ELSE list { $$ = newflow('I',$2,$4,$6);}
+    | WHILE exp DO list { $$ = newflow('W',$2,$4,NULL); }
+    | exp
+    ;
+
+list: /* non */ { $$ = NULL ;}
+    | stmt ';' list { if($3==NULL)
+    			$$ = $1;
+    		      else
+    		        $$ = newast('L',$1,$3);
+    		    }
+    ;
+
+calclist: /* do nothing */
+	| calclist EOL {printf(">");}
+	| calclist stmt EOL { if($2->nodetype!='=')printf("Use \"let\" to declare a variable or function and \"display\" to display the value of variable or expression");printf("\n>");eval((struct ast*)$2);}
+	| calclist DISPLAY stmt EOL {
+				if($3->nodetype!='=')
+				printf("= %.4f\n> ",eval((struct ast*)$3));
+				else
+				{
+					eval((struct ast*)$3);printf(">");
+				}
+				treefree($3);}
+	| calclist LET NAME OPBR symlist CLBR EQU list EOL { dodef($3,$5,$8);
+								printf("Defined: %s\n> ",$3->name);}
+	| calclist LET NAME EQU exp EOL { define_variables($3,$5);printf("Defined a variable: %s\n>",$3->name);}
+	;
+
+%%
+
+
+void define_variables(struct symbol* name,struct ast* st)
+{
+	if(name->syms) symlistfree(name->syms);
+	if(name->func) treefree(name->func);
+	name->value = eval(st);
+	name->not_yet_defined = 0;
+}
+
+static unsigned symhash(char *sym)
+{
+	unsigned int hash = 0;
+	unsigned c;
+	while(c = *sym++) hash = hash*9 ^ c;
+	return hash;
+}
+
+
+struct symbol* lookup(char* sym)
+{
+	struct symbol *sp = &symtab[symhash(sym)%NHASH];
+	int scount = NHASH;
+	while(--scount >= 0) {
+		if(sp->name&&!sp->not_yet_defined && !strcmp(sp->name, sym)) { return sp; }
+		if(!sp->name||sp->not_yet_defined) {
+			sp->name = strdup(sym);
+			sp->value = 0;
+			sp->not_yet_defined = 1;
+			sp->func = NULL;
+			sp->syms = NULL;
+			return sp;
+		}
+		if(++sp >= symtab+NHASH) sp = symtab; 
+
+		yyerror("symbol table overflow\n");
+		abort(); 
+	}
+}
+
+
+
+
+
+struct ast* newast(int nodetype,struct ast* l,struct ast* r)
+{
+	struct ast* rtn;
+	rtn = NULL;
+	rtn = (struct ast*)malloc(sizeof(struct ast));
+	rtn->nodetype = nodetype;
+	rtn->l = l;
+	rtn->r = r;
+	return rtn;
+}
+struct ast* newnum(int nodetype,double f)
+{
+	struct num* rtn;
+	rtn = NULL;
+	rtn = (struct num*)malloc(sizeof(struct num));
+	rtn->nodetype = nodetype;
+	rtn->val = f;
+	return (struct ast*)rtn;
+}
+
+
+struct ast* newcmp(int cmptype,struct ast* l,struct ast* r)
+{
+	struct ast* a = malloc(sizeof(struct ast));
+	if(!a)
+	{
+		yyerror("out of space");
+		exit(0);
+	}
+	a->nodetype = '0'+cmptype;
+	a->l = l;
+	a->r = r;
+	return a;
+}
+
+struct ast* newfunc(int functype,struct ast* l)
+{
+	struct fncall *a = malloc(sizeof(struct fncall));
+	if(!a)
+	{
+		yyerror("out of space");
+		exit(0);
+	}
+	a->nodetype = 'F';
+	a->l = l;
+	a->functype = functype;
+	return (struct ast*)a;
+}
+
+struct ast* newcall(struct symbol *s,struct ast* l)
+{
+	struct ufncall *a = malloc(sizeof(struct ufncall));
+	if(!a)
+	{
+		yyerror("out of space");
+		exit(0);
+	}
+	a->nodetype = 'C';
+	a->l = l;
+	a->s = s;
+	return (struct ast*)a;
+}
+
+struct ast* newref(struct symbol *s)
+{
+	struct symref* a = malloc(sizeof(struct symref));
+	if(!a)
+	{
+		yyerror("out of space");
+		exit(0);
+	}
+	a->nodetype = 'N';
+	a->s = s;
+	return (struct ast*)a;
+}
+
+
+struct ast *newasgn(struct symbol *s, struct ast *v)
+{
+	struct symasgn *a = malloc(sizeof(struct symasgn));
+	if(!a) {
+		yyerror("out of space");
+		exit(0);
+	}
+	a->nodetype = '=';
+	a->s = s;
+	a->v = v;
+	return (struct ast *)a;
+}
+
+
+struct ast *newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *el)
+{
+	struct flow *a = malloc(sizeof(struct flow));
+	if(!a) {
+		yyerror("out of space");
+		exit(0);
+	}
+	a->nodetype = nodetype;
+	a->cond = cond;
+	a->tl = tl;
+	a->el = el;
+	return (struct ast *)a;
+}
+
+void treefree(struct ast *a)
+{
+	switch(a->nodetype) {
+		case ADD:
+		case SUB:
+		case MUL:
+		case DIV:
+		case EXP:
+		case '1': case '2':
+		case 'L':
+		treefree(a->r);
+		case '3':
+		case '4': 
+		case '5': 
+		case '6':
+		case '|':
+		case 'M': 
+		case 'C': 
+		case 'F':
+		case ABS:
+		case UM:
+		treefree(a->l);
+		case NUM: 
+		case 'N':
+		break;
+		case '=':
+		free( ((struct symasgn *)a)->v);
+		break;
+		case 'I': case 'W':
+		free( ((struct flow *)a)->cond);
+		if( ((struct flow *)a)->tl) treefree( ((struct flow *)a)->tl);
+		if( ((struct flow *)a)->el) treefree( ((struct flow *)a)->el);
+		break;
+		default: 
+		printf("internal error: free bad node %c\n", a->nodetype);
+		break;
+	}
+	free(a); 
+}
+
+
+struct symlist *newsymlist(struct symbol *sym, struct symlist *next)
+{
+	struct symlist *sl = malloc(sizeof(struct symlist));
+	if(!sl) {
+		yyerror("out of space");
+		exit(0);
+	}
+	sl->sym = sym;
+	sl->next = next;
+	return sl;
+}
+
+void symlistfree(struct symlist *sl)
+{
+	struct symlist *nsl;
+	while(sl) {
+		nsl = sl->next;
+		free(sl);
+		sl = nsl;
+	}
+}
+
+
+double eval(struct ast* a)
+{
+	double v;
+	if(!a) {
+		yyerror("internal error, null eval");
+		return 0.0;
+	}
+	switch(a->nodetype)
+	{
+		case NUM:
+		return ((struct num*)a)->val;
+		break;
+		
+		case 'N': 
+		v = ((struct symref *)a)->s->value; 
+		break;
+		
+		case '=': 
+		v = ((struct symasgn *)a)->s->value = eval(((struct symasgn *)a)->v);
+	        break;
+		
+		case ADD:
+		return eval(a->l)+eval(a->r);
+		break;
+		
+		case SUB:
+		return eval(a->l)-eval(a->r);
+		break;
+		
+		case MUL:
+		return eval(a->l)*eval(a->r);
+		break;
+		
+		case DIV:
+		return eval(a->l)/eval(a->r);
+		break;
+		
+		case EXP:
+		return pow(eval(a->l),eval(a->r));
+		break;
+		
+		case ABS:
+		v = eval(a->l);
+		return (v>0)?v:-v;
+		break;
+		
+		case UM:
+		v = eval(a->l);
+		return -v;
+		break;
+		
+		
+		case '1':
+		v = (eval(a->l)>eval(a->r))?1:0;break;
+		
+		case '2':
+		v = (eval(a->l)<eval(a->r))?1:0;break;
+		
+		case '3':
+		v = (eval(a->l)!=eval(a->r))?1:0;break;
+		
+		case '4':
+		v = (eval(a->l)==eval(a->r))?1:0;break;
+		
+		case '5':
+		v = (eval(a->l)>=eval(a->r))?1:0;break;
+		
+		case '6':
+		v = (eval(a->l)<=eval(a->r))?1:0;break;
+		
+		
+		case 'I':
+		if(eval(((struct flow*)a)->cond)!=0)
+		{	
+			if(((struct flow*)a)->tl)
+			{
+				v = eval(((struct flow*)a)->tl);
+			}
+			else
+			{
+				v = 0.0;
+			}
+		}
+		else
+		{
+			if(((struct flow*)a)->el)
+			{
+				v = eval(((struct flow*)a)->el);
+			}
+			else
+			{
+				v = 0.0;
+			}
+		}
+		break;
+		
+		case 'W':
+		v = 0.0;
+		if(((struct flow*)a)->tl)
+		{
+			while(eval(((struct flow*)a)->cond)!=0)
+			{
+				v = eval(((struct flow*)a)->tl);
+			}
+		}
+		break;
+		
+		case 'L':
+		eval(a->l); 
+		v = eval(a->r);
+		break;
+		
+		case 'F':
+		v = callbuiltin((struct fncall*)a);
+		break;
+		
+		case 'C':
+		v = calluser((struct ufncall*)a);
+		break;
+			
+		default:
+		printf("Bad operator\n");
+		break;
+	}
+	return v;
+}
+
+static double
+callbuiltin(struct fncall *f)
+{
+	enum bifs functype = f->functype;
+	double v = eval(f->l);
+	switch(functype) {
+		case B_sqrt:
+		return sqrt(v);
+		case B_exp:
+		return exp(v);
+		case B_log:
+		return log(v);
+		case B_print:
+		printf("= %4.4g\n", v);
+		return v;
+		default:
+		yyerror("Unknown built-in function");
+		return 0.0;
+	}
+}
+
+void dodef(struct symbol *name, struct symlist *syms, struct ast *func)
+{
+		if(name->syms) symlistfree(name->syms);
+		if(name->func) treefree(name->func);
+		name->syms = syms;
+		name->func = func;
+		name->not_yet_defined = 0;
+}
+
+
+
+
+static double calluser(struct ufncall *f)
+{
+	struct symbol *fn = f->s;
+	struct symlist *sl;
+	struct ast *args = f->l;
+	double *oldval, *newval;
+	double v;
+	int nargs;
+	int i;
+	if(!fn->func) {
+		yyerror("call to undefined function");
+		return 0;
+	}
+	sl = fn->syms;
+	for(nargs = 0; sl; sl = sl->next)
+	nargs++;
+	oldval = (double *)malloc(nargs * sizeof(double));
+	newval = (double *)malloc(nargs * sizeof(double));
+	if(!oldval || !newval) {
+		yyerror("Out of space in"); return 0.0;
+	}
+	for(i = 0; i < nargs; i++) {
+		if(!args) {
+			yyerror("too few args in call to %s");
+			free(oldval); free(newval);
+			return 0.0;
+		}
+		if(args->nodetype == 'L') { 
+			newval[i] = eval(args->l);
+			args = args->r;
+		}
+	 	else {
+			newval[i] = eval(args);
+			args = NULL;
+		}
+	}
+	sl = fn->syms;
+	for(i = 0; i < nargs; i++) {
+		struct symbol *s = sl->sym;
+		oldval[i] = s->value;
+		s->value = newval[i];
+		sl = sl->next;
+	}
+	free(newval);
+	v = eval(fn->func);
+	sl = fn->syms;
+	for(i = 0; i < nargs; i++) 
+	{
+		struct symbol *s = sl->sym;
+		s->value = oldval[i];
+		sl = sl->next;
+	}
+	free(oldval);
+	return v;
+}
+
+
+
+int main()
+{
+	yydebug = 1;
+	yyparse();
+	return 0;
+}
+
+int yyerror(char *s)
+{
+	fprintf(stderr,"ERROR: %s\n",s);
+	return 0;
+}
